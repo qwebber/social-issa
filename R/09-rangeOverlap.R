@@ -16,7 +16,7 @@ lapply(libs, require, character.only = TRUE)
 
 
 ### Input data ----
-DT <- readRDS('output/7-locs-mod.RDS')
+DT <- readRDS('output/location-data/7-locs-mod.RDS')
 
 DT[, .N, by = c("membership", "lagYear")]
 
