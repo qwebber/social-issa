@@ -2,7 +2,9 @@
 
 ## Moving together, foraging apart: effects of the social environment on movement-integrated habitat selection
 
-[![DOI](https://zenodo.org/badge/4549509.svg)](https://zenodo.org/badge/latestdoi/4549509)
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4549509.svg)](https://doi.org/10.5281/zenodo.4549509)
+
 
   - Authors:
       - [Quinn M.R. Webber](https://qwebber.weebly.com/)
