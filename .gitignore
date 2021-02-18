@@ -3,9 +3,6 @@
 input/
 output/
 
-ignore 336pm
-data 335pm
-
 # R related files #
 ###################
 #*.Rproj
