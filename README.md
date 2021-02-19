@@ -8,9 +8,9 @@
 
   - Authors:
       - [Quinn M.R. Webber](https://qwebber.weebly.com/)
-      - [Christina M. Prokopenko]()
-      - [Katrien A. Turner]()
-      - [Julie W. Turner]()
+      - Christina M. Prokopenko
+      - Katrien A. Turner
+      - Julie W. Turner
       - [Eric Vander Wal](https://weel.gitlab.io/)
 
 This repository contains the code accompanying the paper “Moving together, foraging apart: effects of the social environment on movement-integrated habitat selection”. 
