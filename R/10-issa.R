@@ -6,7 +6,7 @@ libs <- c('data.table', 'dplyr', 'amt', 'lubridate', 'tidyr', 'ggplot2', 'glmmTM
 lapply(libs, require, character.only = TRUE)
 
 # Load data
-DT <- readRDS("output/5-rdm-locs-sri-NN.RDS")
+DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
 
 DT[, .N, by = c("IDYr")]
 
