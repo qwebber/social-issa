@@ -13,7 +13,7 @@ lapply(libs, require, character.only = TRUE)
 #install_local("/Users/quinnwebber/Downloads/data.table-1.12.6.zip")
 
 ### Input raw data ----
-DT <- readRDS("output/2-clean-all-rdm.RDS")
+DT <- readRDS("output/location-data/2-clean-all-rdm.RDS")
 
 ## extract year
 DT$Year <- as.factor(DT$Year)
