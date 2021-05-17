@@ -10,7 +10,7 @@ libs <- c('data.table')
 lapply(libs, require, character.only = TRUE)
 
 ## Load modularity data 
-fogo <- readRDS("output/3-rdm-locs-NN.RDS")
+fogo <- readRDS("output/location-data/3-rdm-locs-NN.RDS")
 
 fogo$DyadYrIter1 <- as.factor(paste(fogo$ANIMAL_ID,
                                    fogo$StartNN_ID, 
@@ -22,7 +22,7 @@ fogo$DyadYrIter2 <- as.factor(paste(fogo$ANIMAL_ID,
                                     fogo$JDate, sep = "_"))
 
 
-sri <- readRDS("output/4-sri.RDS")
+sri <- readRDS("output/location-data/4-sri.RDS")
 sri$DyadYrIter1 <- as.factor(paste(sri$ID1, sri$ID2, sri$Year, sri$iter, sri$JDate, sep = "_"))
 sri$DyadYrIter2 <- as.factor(paste(sri$ID2, sri$ID1, sri$Year, sri$iter, sri$JDate, sep = "_"))
 
