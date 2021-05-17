@@ -12,18 +12,18 @@ dynamic_network <- function(DT = NULL, id = NULL, by = NULL) {
     stop('DT, and id must be provided')
   }
   
-  #DT <- fogo
+  #DT <- DT[Year == "2017"]
   #id <- 'ANIMAL_ID'
   
   DT[, {
-    d <- data.table::dcast(.SD, formula = group ~ get(id), 
+    d <- data.table::dcast(DT, formula = group ~ get(id), 
                            fun.aggregate = length, value.var = 'group')
     
     gbi_df <- data.matrix(d[, !'group', with = FALSE])
     
     rownames(gbi_df) <- d$group
     
-    gbi.net_df <- asnipe::get_network(gbi_df, data_format = "GBI", 
+    gbi.net_df <- asnipe::get_network(gbi_df, data_format = "GBI", times = NULL,
                                       association_index = "SRI")
     
     gbi.grph_df <- igraph::graph_from_adjacency_matrix(gbi.net_df,
