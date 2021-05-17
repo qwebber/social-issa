@@ -10,10 +10,9 @@ libs <- c('data.table', 'spatsoc', 'igraph')
 lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
-fogo <- readRDS("output/3-rdm-locs-NN.RDS")
+fogo <- readRDS("output/location-data/3-rdm-locs-NN.RDS")
 fogo$Year <- as.factor(fogo$Year)
 fogo$IDYrIter <- as.factor(fogo$IDYrIter)
-
 
 #####################################################
 ############# CALCULATE MOVING WINDOW SRI ###########
