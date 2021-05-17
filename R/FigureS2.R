@@ -36,7 +36,7 @@ dynNets2$year[dynNets2$lagYear == "Year3"] <- "2019"
 
 
 # Figure S2
-png('graphics/Fig3.png', units = 'px', 
+png('graphics/FigS2.png', units = 'px', 
     width = 4000, height = 2000, res = 600)
 ggplot() +
   geom_histogram(data = dynNets2, aes(V1), fill = "darkgrey", bins = 15) +
