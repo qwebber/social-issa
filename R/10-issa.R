@@ -19,37 +19,57 @@ length(unique(DT[iter == 1]$groupEnd))
 ## open areas as the reference category
 DT$habitat[DT$habitat == "openMove"] = "aOpenMove"
 
-## NN + SRI model
-core_ssf <- glmmTMB(Use ~ 
+## core model (no interactions)
+core_ssf_no_interactions <- glmmTMB(Use ~ 
                       ## step length and turn angle fixed and random effects 
                       I(log(sl_+1)) + 
                       cos(ta_)  + 
-                      (1|step_id_) + 
-                      I(log(sl_+1))*habitat + 
-                      cos(ta_)*habitat + 
-                      (0 + I(log(sl_+1)) | IDYr) + 
-                      
-                      ## habitat variables: fixed and random effects
                       habitat +
+                      (1|step_id_) + 
+                      
+                      #I(log(sl_+1))*habitat + 
+                      #cos(ta_)*habitat + 
+                      
+                      (0 + I(log(sl_+1)) | IDYr) + 
+                      (0 + cos(ta_) | IDYr) + 
                       (0 + habitat | IDYr),
+                      #(0 + I(log(sl_+1)):habitat | IDYr)  +
+                      #(0 + cos(ta_):habitat | IDYr),
+                      
                     family=poisson(), 
                     data = DT,  
-                    map = list(theta=factor(c(NA,1:7))), 
-                    start = list(theta=c(log(1000), seq(0,0, length.out = 7))))
+                    map = list(theta=factor(c(NA,1:8))), 
+                    start = list(theta=c(log(1000), seq(0,0, length.out = 8))))
 
-summary(core_ssf)
+summary(core_ssf_no_interactions)
+check_collinearity(core_ssf_no_interactions)
+saveRDS(core_ssf, "output/issa models/core_issa_no_interactions.RDS")
 
-saveRDS(core_ssf, "output/issa models/core_issa.RDS")
+## core model (interactions)
+core_ssf_interactions <- glmmTMB(Use ~ 
+                                      ## step length and turn angle fixed and random effects 
+                                      I(log(sl_+1)) + 
+                                      cos(ta_)  + 
+                                      habitat +
+                                      (1|step_id_) + 
+                                      
+                                      I(log(sl_+1))*habitat + 
+                                      cos(ta_)*I(log(sl_+1)) + 
+                                      
+                                      (0 + I(log(sl_+1)) | IDYr) + 
+                                      (0 + cos(ta_) | IDYr) + 
+                                      (0 + habitat | IDYr) +
+                                      (0 + I(log(sl_+1)):habitat | IDYr) +
+                                      (0 + cos(ta_):I(log(sl_+1)) | IDYr),
+                                    
+                                    family=poisson(), 
+                                    data = DT,  
+                                    map = list(theta=factor(c(NA,1:15))), 
+                                    start = list(theta=c(log(1000), seq(0,0, length.out = 15))))
 
-#' Look at individual coefficients
-
-indivs <- coef(core_ssf)$cond$IDYr[ , -1] %>% tibble::rownames_to_column("IDYr") %>% 
-  pivot_longer(-IDYr, names_to = "term", values_to = "estimate") %>% 
-  mutate(method = "ME")
-
-ggplot(indivs) +
-  geom_density(aes(estimate)) +
-  facet_wrap(~term, scale = 'free') 
+summary(core_ssf_interactions)
+check_collinearity(core_ssf_interactions)
+saveRDS(core_ssf, "output/issa models/core_issa_interactions.RDS")
 
 ## NN + SRI model
 NN_ssf <- glmmTMB(Use ~ 
@@ -59,8 +79,12 @@ NN_ssf <- glmmTMB(Use ~
                       I(log(sl_+1))*habitat + 
                       cos(ta_)*habitat + 
                       (1|step_id_) + 
+                    
                       (0 + I(log(sl_+1)) | IDYr) + 
-                      
+                      #(0 + cos(ta_)) | IDYr) + 
+                      #(0 + I(log(sl_+1)):habitat | IDYr)  +
+                      #(0 + cos(ta_):habitat | IDYr)  +  
+                       
                       ## habitat variables: fixed and random effects
                       habitat +
                       (0 + habitat | IDYr) +
@@ -70,11 +94,11 @@ NN_ssf <- glmmTMB(Use ~
                       (0 + I(log(EndDist+1)) | IDYr) + 
                       
                       I(log(StartDist + 1))*I(log(sl_+1)) +
-                      #I(log(StartDist + 1))*ta_ +
                       (0 + I(log(StartDist + 1)):I(log(sl_+1)) | IDYr)  +
                       
                       I(log(EndDist + 1))*habitat + 
                       (0 + I(log(EndDist + 1)):habitat | IDYr), 
+                  
                     family=poisson(), 
                     data = DT,  
                     map = list(theta=factor(c(NA,1:15))), 
