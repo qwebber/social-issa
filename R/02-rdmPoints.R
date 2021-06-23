@@ -10,12 +10,14 @@ libs <- c('data.table', 'ggplot2', 'rgdal', 'spatsoc', 'amt',
 lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
-DT <- readRDS("output/1-clean-all.RDS")
+DT <- readRDS("output/location-data/1-clean-all.RDS")
 
 DT <- DT[!is.na(season)]
 
-DT[, .N, by = "IDYr"]
-
+## calculate number of fixes per IDYr
+mean(DT[, .N, by = "IDYr"]$N)
+sd(DT[, .N, by = "IDYr"]$N)
+range(DT[, .N, by = "IDYr"]$N)
 
 ## order by datetime
 DT <- DT[order(DT$datetime),]
