@@ -10,7 +10,7 @@ libs <- c('data.table', 'spatsoc', 'asnipe', 'igraph',
 lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
-DT <- readRDS("output/1-clean-all.RDS")
+DT <- readRDS("output/location-data/1-clean-all.RDS")
 
 DT <- DT[season == "winter"]
 
