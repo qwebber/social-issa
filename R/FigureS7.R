@@ -21,13 +21,15 @@ aic <- data.table(model = c( "Core 1 (No random terms)",
                             "NN (Random terms included, no interactions)",
                             "SRI (Random terms included, no interactions)"),
                   AIC = c(AIC(core_ssf_no_rdm),
-                          AIC(core_ssf_rdm),
+                          260386.6, #AIC(core_ssf_rdm),
                           AIC(core_ssf_rdm_int),
                           AIC(NN_ssf_rdm),
                           AIC(SRI_ssf_rdm)))
 
 aic$deltaAIC = min(aic$AIC, na.rm = T) - aic$AIC
 aic
+
+summary(SRI_ssf_rdm)
 
 eff1 <- data.table(term = rbind(data.table(rownames(data.frame(summary(core_ssf_no_rdm)[6]$coefficients$cond[,1])))),
                    coef = data.table(summary(core_ssf_no_rdm)[6]$coefficients$cond[,1]),
@@ -47,25 +49,21 @@ eff3 <- data.table(term = rbind(data.table(rownames(data.frame(summary(core_ssf_
                    model = "Core 3 (Random terms included, only interactions)",
                    set = "Core")
 
-eff4 <- data.table(term = rbind(data.table(rownames(data.frame(summary(NN_ssf_no_rdm)[6]$coefficients$cond[,1])))),
-                   coef = data.table(summary(NN_ssf_no_rdm)[6]$coefficients$cond[,1]),
-                   se = data.table(summary(NN_ssf_no_rdm)[6]$coefficients$cond[,2]),
-                   model = "NN 1 (No random terms)",
-                   set = "NN")
-
-eff5 <- data.table(term = rbind(data.table(rownames(data.frame(summary(NN_ssf_rdm)[6]$coefficients$cond[,1])))),
+eff4 <- data.table(term = rbind(data.table(rownames(data.frame(summary(NN_ssf_rdm)[6]$coefficients$cond[,1])))),
                    coef = data.table(summary(NN_ssf_rdm)[6]$coefficients$cond[,1]),
                    se = data.table(summary(NN_ssf_rdm)[6]$coefficients$cond[,2]),
-                   model = "NN 2 (Random terms included, no interactions)",
+                   model = "NN (Random terms included, no interactions)",
                    set = "NN")
 
-eff6 <- data.table(term = rbind(data.table(rownames(data.frame(summary(NN_ssf_rdm_int)[6]$coefficients$cond[,1])))),
-                   coef = data.table(summary(NN_ssf_rdm_int)[6]$coefficients$cond[,1]),
-                   se = data.table(summary(NN_ssf_rdm_int)[6]$coefficients$cond[,2]),
-                   model = "NN 3 (Random terms included, only interactions)",
-                   set = "NN")
+eff5 <- data.table(term = rbind(data.table(rownames(data.frame(summary(SRI_ssf_rdm)[6]$coefficients$cond[,1])))),
+                   coef = data.table(summary(SRI_ssf_rdm)[6]$coefficients$cond[,1]),
+                   se = data.table(summary(SRI_ssf_rdm)[6]$coefficients$cond[,2]),
+                   model = "SRI (Random terms included, no interactions)",
+                   set = "SRI")
 
-eff_all <- rbind(eff1, eff2, eff3, eff4, eff5, eff6)
+eff_all <- rbind(eff1, eff2, eff3, eff4, eff5)
+
+eff_all$CIlow <- (eff_all$se * -0.96)
 
 setnames(eff_all, c("term.V1", "coef.V1", "se.V1"), c("term", "coef", "se"))
 
@@ -85,15 +83,16 @@ ggplot(eff_all[term != "(Intercept)" & set == "Core"]) +
   geom_hline(yintercept = 4.5, lty = 2) +
   geom_hline(yintercept = 5.5, lty = 2) +
   geom_hline(yintercept = 6.5, lty = 2) +
-  #geom_hline(yintercept = 7.5, lty = 2) +
-  #geom_hline(yintercept = 8.5, lty = 2) +
+  geom_hline(yintercept = 7.5, lty = 2) +
+  geom_hline(yintercept = 8.5, lty = 2) +
   geom_hline(yintercept = 9.5, lty = 2) +
   geom_hline(yintercept = 10.5, lty = 2) +
   geom_hline(yintercept = 11.5, lty = 2) +
   geom_hline(yintercept = 12.5, lty = 2) +
   geom_hline(yintercept = 13.5, lty = 2) +
   geom_hline(yintercept = 14.5, lty = 2) +
-  scale_y_discrete(labels = c(`I(log(sl_ + 1))` = "Step length", 
+  geom_hline(yintercept = 15.5, lty = 2) +
+    scale_y_discrete(labels = c(`I(log(sl_ + 1))` = "Step length", 
                               `cos(ta_)` = "Turn angle",
                               `habitatForest` = "Forest", 
                               `habitatopenForage` = "Lichen",
