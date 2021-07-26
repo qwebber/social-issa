@@ -8,14 +8,7 @@ library(dotwhisker)
 library(ggforce)
 
 ## load data
-core <- readRDS("output/issa models/core_issa.RDS")
-NN_ssf <- readRDS("output/issa models/NN_issa.RDS")
-sri_ssf <- readRDS("output/issa models/sri_issa.RDS")
-
-aic <-AIC(core, NN_ssf, sri_ssf)
-
-aic$delta <-  round(aic$AIC - 185513.1, 1)
-
+sri_ssf <- readRDS("output/issa models/3-SRI_issa_rdm.RDS")
 
 ## pull out fixed effects
 sri_ssf2 <- tidy(sri_ssf)
@@ -24,13 +17,14 @@ sri_ssf2$model <- "SRI"
 setDT(sri_ssf2)
 
 sri_ssf2$term2 <- factor(sri_ssf2$term, levels=c(rev(sri_ssf2$term)))
+sri_ssf2 <- sri_ssf2[effect == "fixed"]
+
 sri_ssf2$model_var <- data.table(c(rep("Core", 5),
                                    rep("Nearest neighbour", 2),
                                    rep("Simple ratio index", 1),
-                                   rep("Core", 4),
+                                   rep("Core", 3),
                                    rep("Nearest neighbour", 3),
-                                   rep("Simple ratio index", 3),
-                                   rep("NA", 8)))
+                                   rep("Simple ratio index", 3)))
 
 png("graphics/Fig3.png", width = 5000, height = 5000, units = "px", res = 600)
 ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
@@ -49,8 +43,7 @@ ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
                               `I(log(sri + 0.125))` = "Simple ratio index", 
                               `I(log(sl_ + 1)):habitatForest` = "Step length : Forest", 
                               `I(log(sl_ + 1)):habitatopenForage` = "Step length : Lichen", 
-                              `cos(ta_):habitatForest` = "Turn angle : Forest", 
-                              `cos(ta_):habitatopenForage` = "Turn angle : Lichen",
+                              `I(log(sl_ + 1)):cos(ta_)` = "Turn angle : Step length", 
                               `I(log(sl_ + 1)):I(log(StartDist + 1))` = "Step length : Nearest neigbhour (start)",
                               `habitatForest:I(log(EndDist + 1))` = "Forest : Nearest neighbour (end)",
                               `habitatopenForage:I(log(EndDist + 1))` = "Lichen : Nearest neighbour (end)",
@@ -70,7 +63,7 @@ ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
         panel.grid.minor = element_blank(),
         panel.background = element_blank(), 
         panel.border = element_rect(colour = "black", fill=NA, size = 1)) +
-facet_zoom(xlim = c(-0.4, 0.4)) # zoom.data = ifelse(a <= 0.5, NA, FALSE))
+facet_zoom(xlim = c(-0.45, 0.45)) # zoom.data = ifelse(a <= 0.5, NA, FALSE))
 dev.off()
 
 
