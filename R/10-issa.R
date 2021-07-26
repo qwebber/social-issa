@@ -76,7 +76,6 @@ core_ssf_rdm <- glmmTMB(Use ~
                                       (1|step_id_) + 
                                       
                                       I(log(sl_+1))*habitat + 
-                                      habitat*cos(ta_) +
                                       I(log(sl_+1))*cos(ta_) +
                                        
                                       (0 + I(log(sl_+1)) | IDYr) + 
