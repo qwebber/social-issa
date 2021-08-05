@@ -84,8 +84,8 @@ core_ssf_rdm <- glmmTMB(Use ~
                                     
                                     family=poisson(), 
                                     data = DT,  
-                                    map = list(theta=factor(c(NA,1:8))), 
-                                    start = list(theta=c(log(1000), seq(0,0, length.out = 8))))
+                                    map = list(theta=factor(c(NA,1:10))), 
+                                    start = list(theta=c(log(1000), seq(0,0, length.out = 10))))
 
 summary(core_ssf_rdm)
 saveRDS(core_ssf_rdm, "output/issa models/3-core_issa_rdm.RDS")
