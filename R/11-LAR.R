@@ -17,7 +17,9 @@ fogo$Year <- as.factor(fogo$Year)
 fogo <- fogo[!is.na(season)]
 
 fogo$IDmemb <- as.factor(paste(fogo$ANIMAL_ID, fogo$membership, sep = "_"))
-
+a1 <- fogo[, .N, by = c("ANIMAL_ID", "membership", "Year")]
+a1[, c("N") := NULL]
+write.csv(a1, "output/community_membership.csv")
 
 ######################## 
 ######## 2017 ######### 
