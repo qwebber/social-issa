@@ -14,7 +14,7 @@ DT <- readRDS("output/location-data/1-clean-all.RDS")
 
 DT[, .N, by = "IDYr"]
 
-DT <- DT[season == "winter"]
+#DT <- DT[season == "winter"]
 
 ###### GENERATE NETWORKS FOR OBSERVED DATA ######
 
