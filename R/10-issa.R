@@ -17,7 +17,8 @@ DT$Use[DT$case_ == "FALSE"] <- 0
 length(unique(DT[iter == 1]$groupEnd))
 
 ## open areas as the reference category
-DT$habitat[DT$habitat == "openMove"] = "aOpenMove"
+DT[,habitat := factor(habitat, levels = c('openMove', 'Forest', 'openForage'))]
+
 
 ## create unique step id by animal
 DT[,'caribou_step_id_'] <- paste(DT$IDYr, DT$step_id_, sep = '_')
@@ -233,33 +234,42 @@ SRI_issa_rdm <- glmmTMB(Use ~
                          ## step length and turn angle fixed and random effects 
                          I(log(sl_+1)) + 
                          cos(ta_) +
-                         I(log(sl_+1))*habitat + 
-                         I(log(sl_+1))*cos(ta_) +
-                         (1|caribou_step_id_) + 
+                         #I(log(sl_+1))*habitat + 
+                          I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
+                         I(log(sl_+1)):cos(ta_) +
+                         
                          
                          ## habitat variables: fixed and random effects
-                         habitat +
-                         
+                         #habitat +
+                          propOpenMove + propForest + propLichen +
                          ## social variables in interactions with movement and habitat 
                          I(log(EndDist + 1)) + 
-                         I(log(StartDist + 1))*I(log(sl_+1)) +
-                         I(log(EndDist + 1))*habitat + 
+                         I(log(StartDist + 1)):I(log(sl_+1)) +
+                         I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
                          
                          I(log(sri+0.125)) +
-                         I(log(sri+0.125))*I(log(sl_+1)) +
-                         I(log(sri+0.125))*habitat + 
+                         I(log(sri+0.125)):I(log(sl_+1)) +
+                         I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
                           
-                         ## random effects    
-                         (0 + habitat | IDYr) +
-                         (0 + I(log(sl_+1)) | IDYr) + 
-                         (0 + cos(ta_) | IDYr) +
-                         (0 + I(log(EndDist+1)) | IDYr) +
-                         (0 + I(log(sri+0.125)) | IDYr),
+                         ## random effects  
+                          (1|caribou_step_id_) + 
+                          (0 + I(log(sl_+1)) | IDYr) +
+                          (0 + cos(ta_) | IDYr) +
+                          (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                          (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
+                          (0 + propForest:I(log(EndDist+1)) | IDYr) +
+                          (0 + propForest:I(log(sri+0.125))| IDYr) +
+                          (0 + propLichen:I(log(EndDist+1)) | IDYr) +
+                          (0 + propLichen:I(log(sri+0.125))| IDYr) +
+                          (0 + I(log(EndDist+1)) | IDYr) +
+                          (0 + I(log(sri+0.125)) | IDYr) +
+                          (0 + I(log(StartDist + 1)):I(log(sl_+1)) | IDYr) +
+                          (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr),
                         
                        family=poisson(), 
                        data = DT,  
-                       map = list(theta=factor(c(NA,1:10))), 
-                       start = list(theta=c(log(1000), seq(0,0, length.out = 10))))
+                       map = list(theta=factor(c(NA,1:12))), 
+                       start = list(theta=c(log(1000), seq(0,0, length.out = 12))))
 
 summary(SRI_issa_rdm)
 saveRDS(SRI_issa_rdm, "output/issa models/3-SRI_issa_rdm.RDS")
