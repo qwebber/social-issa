@@ -19,13 +19,17 @@ length(unique(DT[iter == 1]$groupEnd))
 ## open areas as the reference category
 DT$habitat[DT$habitat == "openMove"] = "aOpenMove"
 
+## create unique step id by animal
+DT[,'caribou_step_id_'] <- paste(DT$IDYr, DT$step_id_, sep = '_')
+
+
 ## core model (no interactions or random effects)
 core_ssf_vif <- glmmTMB(Use ~ 
                       ## step length and turn angle fixed and random effects 
                       I(log(sl_+1)) + 
                       cos(ta_)  + 
                       habitat +
-                      (1|step_id_) + 
+                      (1|caribou_step_id_) + 
                       
                       #I(log(sl_+1))*habitat + 
                       #cos(ta_)*habitat + 
@@ -73,7 +77,7 @@ core_ssf_rdm <- glmmTMB(Use ~
                                       I(log(sl_+1)) + 
                                       cos(ta_)  + 
                                       habitat +
-                                      (1|step_id_) + 
+                                      (1|caribou_step_id_) + 
                                       
                                       I(log(sl_+1))*habitat + 
                                       I(log(sl_+1))*cos(ta_) +
@@ -96,7 +100,7 @@ core_ssf_rdm_int <- glmmTMB(Use ~
                           I(log(sl_+1)) + 
                           cos(ta_)  + 
                           habitat +
-                          (1|step_id_) + 
+                          (1|caribou_step_id_) + 
                           
                           I(log(sl_+1))*habitat + 
                           I(log(sl_+1))*cos(ta_) +
@@ -119,7 +123,7 @@ NN_ssf_vif <- glmmTMB(Use ~
                         ## step length and turn angle fixed and random effects 
                         I(log(sl_+1)) + 
                         cos(ta_) +
-                        (1|step_id_) + 
+                        (1|caribou_step_id_) + 
                         
                         ## habitat variables: fixed and random effects
                         habitat +
@@ -147,7 +151,7 @@ NN_ssf_no_rdm <- glmmTMB(Use ~
                            I(log(sl_+1))*habitat + 
                            #cos(ta_)*habitat + 
                            cos(ta_)*I(log(sl_+1)) +
-                           (1|step_id_) + 
+                           (1|caribou_step_id_) + 
                            
                            ## habitat variables: fixed and random effects
                            habitat +
@@ -174,7 +178,7 @@ NN_issa_rdm <- glmmTMB(Use ~
                       I(log(sl_+1))*habitat + 
                       #cos(ta_)*habitat + 
                       I(log(sl_+1))*cos(ta_) +
-                      (1|step_id_) + 
+                      (1|caribou_step_id_) + 
                     
                       ## habitat variables: fixed and random effects
                       habitat +
@@ -206,7 +210,7 @@ SRI_ssf_vif <- glmmTMB(Use ~
                         ## step length and turn angle fixed and random effects 
                         I(log(sl_+1)) + 
                         cos(ta_) +
-                        (1|step_id_) + 
+                        (1|caribou_step_id_) + 
                         
                         ## habitat variables: fixed and random effects
                         habitat +
@@ -231,7 +235,7 @@ SRI_issa_rdm <- glmmTMB(Use ~
                          cos(ta_) +
                          I(log(sl_+1))*habitat + 
                          I(log(sl_+1))*cos(ta_) +
-                         (1|step_id_) + 
+                         (1|caribou_step_id_) + 
                          
                          ## habitat variables: fixed and random effects
                          habitat +
