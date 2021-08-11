@@ -21,10 +21,10 @@ DT$Use[DT$case_ == "FALSE"] <- 0
 length(unique(DT[iter == 1]$groupEnd))
 
 ## open areas as the reference category
-DT$habitat[DT$habitat == "openMove"] = "aOpenMove"
+#DT$habitat[DT$habitat == "openMove"] = "aOpenMove"
 
-## subset to only observed individuals
-DT <- DT[iter == 1]
+# ## subset to only observed individuals
+# DT <- DT[iter == 1]
 
 
 
@@ -38,12 +38,12 @@ p.pop <- function(DT, mod, habvar, habvalue, socvar, socvalue){
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
-        propOpenMove = ifelse(habvar == 'open', habvalue, mean(propOpenMove)),
-        propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen)),
-        propForest = ifelse(habvar == 'forest', habvalue, mean(propForest)),
-        StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist)),  
-        sri = ifelse(socvar == 'sri', socvalue, mean(sri)),
-        EndDist = ifelse(socvar == 'EndDist', socvalue, mean(EndDist)), 
+        propOpenMove = ifelse(habvar == 'open', habvalue, mean(propOpenMove, na.rm = T)),
+        propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen, na.rm = T)),
+        propForest = ifelse(habvar == 'forest', habvalue, mean(propForest, na.rm = T)),
+        StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist, na.rm = T)),  
+        sri = ifelse(socvar == 'sri', socvalue, mean(sri, na.rm = T)),
+        EndDist = ifelse(socvar == 'EndDist', socvalue, mean(EndDist, na.rm = T)), 
         caribou_step_id_ = NA,
         IDYr = NA
       )],
@@ -64,12 +64,12 @@ p.indiv <- function(ids, DT, mod, habvar, habvalue, socvar, socvalue){
         newdata = .SD[, .(
           sl_ = mean(sl_),
           ta_ = mean(ta_),
-          propOpenMove = ifelse(habvar == 'open', habvalue, mean(propOpenMove)),
-          propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen)),
-          propForest = ifelse(habvar == 'forest', habvalue, mean(propForest)),
-          StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist)),  
-          sri = ifelse(socvar == 'sri', socvalue, mean(sri)),
-          EndDist = ifelse(socvar == 'EndDist', socvalue, mean(EndDist)),
+          propOpenMove = ifelse(habvar == 'open', habvalue, mean(propOpenMove, na.rm = T)),
+          propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen, na.rm = T)),
+          propForest = ifelse(habvar == 'forest', habvalue, mean(propForest, na.rm = T)),
+          StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist, na.rm = T)),  
+          sri = ifelse(socvar == 'sri', socvalue, mean(sri, na.rm = T)),
+          EndDist = ifelse(socvar == 'EndDist', socvalue, mean(EndDist, na.rm = T)),
           caribou_step_id_ = NA,
           IDYr = i
         )],
@@ -88,55 +88,72 @@ caribouID <- unique(as.character(DT$IDYr))
 
 
 
-
+# habitat 2
+hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
+  #unique(
+  DT[
+    ,.(h2 = predict(
+      sri_ssf,
+      newdata = .SD[, .(
+        sl_ = mean(sl_),
+        ta_ = mean(ta_),
+        propOpenMove = mean(propOpenMove, na.rm = T),
+        propLichen = mean(propLichen, na.rm = T),
+        propForest = mean(propForest, na.rm = T),
+        StartDist = mean(StartDist, na.rm = T),  
+        sri = mean(sri, na.rm = T),
+        EndDist = mean(EndDist, na.rm = T),
+        caribou_step_id_ = NA,
+        IDYr = i
+      )],
+      type = "link",
+      re.form = NULL
+    ), 
+    IDYr = i)]
+  # )
+}))
+  # rbindlist(p.indiv(ids=caribouID, DT=DT, mod = sri_ssf,
+  #                         habvar = NULL, habvalue = NULL,
+  #                         socvar = NULL, socvalue = NULL))
 ## lichen
-lichen_pred_s1 <- 
-  rbindlist(lapply(caribouID, function(i) {
-    #unique(
-    DT[
-      ,.(hab = predict(
-        sri_ssf,
-        newdata = .SD[, .(
-          sl_ = mean(sl_),
-          ta_ = mean(ta_),
-          habitat = factor("openForage", levels = c('openForage', 'not')), 
-          StartDist = mean(StartDist),  
-          sri =  mean(sri),
-          EndDist = mean(EndDist), 
-          caribou_step_id_ = NA,
-          IDYr = i
-        )],
-        type = "link",
-        re.form = NULL
-      ), 
-      IDYr = i, habitat = 'openForage')]
-    # )
-  }))
+lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
+  #unique(
+  DT[
+    ,.(hab = predict(
+      sri_ssf,
+      newdata = .SD[, .(
+        sl_ = mean(sl_),
+        ta_ = mean(ta_),
+        propOpenMove = mean(propOpenMove, na.rm = T),
+        propLichen = 0.75,
+        propForest = mean(propForest, na.rm = T),
+        StartDist = mean(StartDist, na.rm = T),  
+        sri = mean(sri, na.rm = T),
+        EndDist = mean(EndDist, na.rm = T),
+        caribou_step_id_ = NA,
+        IDYr = i
+      )],
+      type = "link",
+      re.form = NULL
+    ), 
+    IDYr = i)]
+  # )
+}))
+lichen_rss <- lichen_pred_s1[,.(IDYr, habvar, habvalue ,rss = hab-hab_pred_s2$h2)]
 
-lichen_pred_s2 <- 
- rbindlist( lapply(caribouID, function(i) {
-    #unique(
-    DT[
-      ,.(hab = predict(
-        sri_ssf,
-        newdata = .SD[, .(
-          sl_ = mean(sl_),
-          ta_ = mean(ta_),
-          habitat = factor("openForage", levels = c('aOpenMove', 'Forest','openForage')), 
-          StartDist = mean(StartDist),  
-          sri =  mean(sri),
-          EndDist = mean(EndDist), 
-          caribou_step_id_ = NA,
-          IDYr = i
-        )],
-        type = "link",
-        re.form = NULL
-      ), 
-      IDYr = i)]
-    # )
-  }))
 
-lichen_rss <- lichen_pred_s1[,.(IDYr, habitat,rss = hab-lichen_pred_s2$hab)]
+## forest
+forest_pred_s1 <- rbindlist(p.indiv(ids=caribouID, DT=DT, mod = sri_ssf,
+                                    habvar = 'forest', habvalue = 0.75,
+                                    socvar = NA, socvalue = NA))
+forest_rss <- forest_pred_s1[,.(IDYr, habitat,rss = hab-hab_pred_s2$hab)]
+
+## open
+open_pred_s1 <- rbindlist(p.indiv(ids=caribouID, DT=DT, mod = sri_ssf,
+                                    habvar = 'open', habvalue = 0.75,
+                                    socvar = NA, socvalue = NA))
+open_rss <- open_pred_s1[,.(IDYr, habitat,rss = hab-hab_pred_s2$hab)]
+
 
 ## forest
 forest_pred_s1 <- 
