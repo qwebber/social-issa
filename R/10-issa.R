@@ -22,6 +22,7 @@ DT[,habitat := factor(habitat, levels = c('openMove', 'Forest', 'openForage'))]
 
 ## create unique step id by animal
 DT[,'caribou_step_id_'] <- paste(DT$IDYr, DT$step_id_, sep = '_')
+#DT[,'caribou_iter_step_id_'] <- paste(DT$IDYr, DT$iter, DT$step_id_, sep = '_')
 
 
 ## core model (no interactions or random effects)
@@ -230,16 +231,17 @@ check_collinearity(SRI_ssf_vif)
 saveRDS(SRI_ssf_vif, "output/issa models/1-SRI_ssf_vif.RDS")
 
 ## included random effects, but no interactions
-SRI_issa_rdm <- glmmTMB(Use ~ 
+
+SRI_issa_rdm <- glmmTMB(case_ ~ 
                          ## step length and turn angle fixed and random effects 
                          I(log(sl_+1)) + 
-                         cos(ta_) +
+                         #I(cos(ta_)) +
                          #I(log(sl_+1))*habitat + 
                           I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
-                         I(log(sl_+1)):cos(ta_) +
+                         #I(log(sl_+1)):I(cos(ta_)) +
                          
                          
-                         ## habitat variables: fixed and random effects
+                         ## habitat variables
                          #habitat +
                           propOpenMove + propForest + propLichen +
                          ## social variables in interactions with movement and habitat 
@@ -254,7 +256,7 @@ SRI_issa_rdm <- glmmTMB(Use ~
                          ## random effects  
                           (1|caribou_step_id_) + 
                           (0 + I(log(sl_+1)) | IDYr) +
-                          (0 + cos(ta_) | IDYr) +
+                         # (0 + cos(ta_) | IDYr) +
                           (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
                           (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
                           (0 + propForest:I(log(EndDist+1)) | IDYr) +
@@ -268,9 +270,12 @@ SRI_issa_rdm <- glmmTMB(Use ~
                         
                        family=poisson(), 
                        data = DT,  
-                       map = list(theta=factor(c(NA,1:12))), 
-                       start = list(theta=c(log(1000), seq(0,0, length.out = 12))))
+                       map = list(theta=factor(c(NA,1:11))), 
+                       start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
 
 summary(SRI_issa_rdm)
+ran_vals <-tidy(SRI_issa_rdm, effect= 'ran_vals')
+indiv.se <-setDT(ran_vals)[group=='IDYr']
+
 saveRDS(SRI_issa_rdm, "output/issa models/3-SRI_issa_rdm.RDS")
 
