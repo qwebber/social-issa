@@ -259,7 +259,7 @@ open_sri_rss[,rss_total:= rss.x + rss_hab]
 
 
 
-#baseRSS <- rbind(lichen_rss, forest_rss, open_rss)
+#### collect all RSS ####
 df_id <- rbind(lichen_NN_rss ,forest_NN_rss, open_NN_rss,
                lichen_sri_rss ,forest_sri_rss, open_sri_rss)
 df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss.x, rss_hab, rss_total)]
@@ -268,66 +268,43 @@ df_pop <- rbind(step_ssf_pop ,step_ssf_pop_NN, step_ssf_pop_sri)
 saveRDS(df_pop, "output/11-RSS-POP.RDS")
 
 
-
-lichenplot <- ggplot() +
-  geom_line(data = lichen_NN_rss, 
-            aes(socvalue, rss_total, 
-                group = IDYr, 
-                color = habvar), 
-            lty = 1, 
-            lwd = 0.1) +
-  # geom_line(data = step_ssf_pop_NN, 
-  #           aes(env,rss, 
-  #               color = category), 
-  #           lty = 1, 
-  #           lwd = 1) +
-  scale_color_manual(values = c("#f1a340", "#91bfdb", "#5ab4ac")) +
-  ylab("log(relative selection strength)") +
-  xlab("Nearest Neighbour distance (m)") +
-  #ggtitle("B)") +
-  geom_hline(yintercept = 0, lty = 2) +
-  theme(legend.position = 'none',
-        strip.background = element_rect(color = "black", 
-                                        fill = "white", 
+#### plots ####
+colors <- c('forest' = "#f1a340",'lichen' = "#91bfdb",'open' = "#5ab4ac")
+png("graphics/FigS4.1.png", width = 6000, height = 6000, units = "px", res = 600)
+aa <- ggplot(data = DT[case_ == TRUE]) +
+  # geom_point(aes(propLichen, sl_/2,
+  #               group = IDYr,
+  #               color = "#f1a340")) +
+  # geom_point(aes(propForest, sl_/2,
+  #               group = IDYr,
+  #               color = "#91bfdb")) +
+  # geom_point(aes(propOpenMove, sl_/2,
+  #               group = IDYr,
+  #               color = "#5ab4ac")) +
+  geom_smooth(aes(propLichen, sl_/2,
+                  fill = "lichen", color = 'lichen'), method = 'glm') +
+  geom_smooth(aes(propForest, sl_/2,
+                  fill = "forest", color = 'forest'), method = 'glm') +
+  geom_smooth(aes(propOpenMove, sl_/2,
+                  fill = "open", color = "open"), method = 'glm') +
+  labs(x = "Proportion of habitat",
+      y = "Speed (m/hr)",
+      color = "Legend") +
+  scale_color_manual(values = colors) +
+  scale_fill_manual(values = colors) +
+  theme(
+        strip.background = element_rect(color = "black",
+                                        fill = "white",
                                         size = 1),
         strip.text = element_text(size = 14, color = "black"),
         axis.title = element_text(size = 14, color = 'black'),
         axis.text = element_text(size = 12, color = 'black'),
         panel.grid.minor = element_blank(),
-        panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill=NA, size = 1))
-
-
-
-png("graphics/FigS4.1.png", width = 6000, height = 6000, units = "px", res = 600)
-# aa <- ggplot() +
-#   geom_points(data = dat[case_ == TRUE], 
-#             aes(propLichen, sl_/2, 
-#                 group = IDYr, 
-#                 color = "#f1a340")) +
-#   geom_points(data = dat[case_ == TRUE], 
-#             aes(propForest, sl_/2, 
-#                 group = IDYr, 
-#                 color = "#91bfdb")) +
-#   geom_points(data = dat[case_ == TRUE], 
-#             aes(propOpenMove, sl_/2, 
-#                 group = IDYr, 
-#                 color = "#5ab4ac")) +
-#   scale_color_manual(values = c("#f1a340", "#91bfdb", "#5ab4ac")) +
-#   ylab("log(relative selection strength)") + 
-#   xlab("Speed (m/hr)") +
+        panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size = 1)) 
+  
 #   #ggtitle("A)") +
 #   geom_hline(yintercept = 0, lty = 2) +
-#   theme(legend.position = 'none',
-#         strip.background = element_rect(color = "black", 
-#                                         fill = "white", 
-#                                         size = 1),
-#         strip.text = element_text(size = 14, color = "black"),
-#         axis.title = element_text(size = 14, color = 'black'),
-#         axis.text = element_text(size = 12, color = 'black'),
-#         panel.grid.minor = element_blank(),
-#         panel.background = element_blank(), 
-#         panel.border = element_rect(colour = "black", fill=NA, size = 1)) +
 #   facet_wrap(~category)
   
 bb <- ggplot() +
