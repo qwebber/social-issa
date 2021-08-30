@@ -8,8 +8,7 @@ lapply(libs, require, character.only = TRUE)
 
 # Load data
 DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
-sri_ssf <- readRDS("output/issa models/3-sri_issa_rdm.RDS")
-#NN_ssf <- readRDS("output/issa models/3-NN_issa_rdm.RDS")
+sri_ssf <- readRDS("output/issa models/3-SRI_issa_rdm.RDS")
 summary(sri_ssf)
 
 DT[, .N, by = c("IDYr")]
@@ -27,7 +26,6 @@ length(unique(DT[iter == 1]$groupEnd))
 # DT <- DT[iter == 1]
 
 
-
 #### RSS functions ####
 ### POP ###
 p.pop <- function(DT, mod, habvar, habvalue, socvar, socvalue){
@@ -42,7 +40,7 @@ p.pop <- function(DT, mod, habvar, habvalue, socvar, socvalue){
         propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen, na.rm = T)),
         propForest = ifelse(habvar == 'forest', habvalue, mean(propForest, na.rm = T)),
         StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist, na.rm = T)),  
-        sri = ifelse(socvar == 'sri', seq(0, 1, length.out = 100), mean(sri, na.rm = T)),
+        #sri = ifelse(socvar == 'sri', seq(0, 1, length.out = 100), mean(sri, na.rm = T)),
         EndDist = ifelse(socvar == 'EndDist', 1:500, mean(EndDist, na.rm = T)),
         caribou_step_id_ = NA,
         IDYr = NA
@@ -68,8 +66,8 @@ p.indiv <- function(ids, DT, mod, habvar, habvalue, socvar, socvalue){
           propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen, na.rm = T)),
           propForest = ifelse(habvar == 'forest', habvalue, mean(propForest, na.rm = T)),
           StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist, na.rm = T)),  
-          sri = if(socvar == 'sri') seq(0, 1, length.out = 100)
-          else mean(sri, na.rm = T),
+          #sri = if(socvar == 'sri') seq(0, 1, length.out = 100)
+          #else mean(sri, na.rm = T),
           EndDist = if(socvar == 'EndDist') 1:500 
           else mean(EndDist, na.rm = T),
           caribou_step_id_ = NA,
@@ -103,7 +101,7 @@ hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
         propLichen = mean(propLichen, na.rm = T),
         propForest = mean(propForest, na.rm = T),
         StartDist = mean(StartDist, na.rm = T),  
-        sri = mean(sri, na.rm = T),
+        #sri = mean(sri, na.rm = T),
         EndDist = mean(EndDist, na.rm = T),
         caribou_step_id_ = NA,
         IDYr = i
@@ -130,7 +128,7 @@ lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
         propLichen = 0.75,
         propForest = mean(propForest, na.rm = T),
         StartDist = mean(StartDist, na.rm = T),  
-        sri = mean(sri, na.rm = T),
+        #sri = mean(sri, na.rm = T),
         EndDist = mean(EndDist, na.rm = T),
         caribou_step_id_ = NA,
         IDYr = i
@@ -268,113 +266,6 @@ df_pop <- rbind(step_ssf_pop ,step_ssf_pop_NN, step_ssf_pop_sri)
 saveRDS(df_pop, "output/11-RSS-POP.RDS")
 
 
-#### plots ####
-colors <- c('forest' = "#f1a340",'lichen' = "#91bfdb",'open' = "#5ab4ac")
-png("graphics/FigS4.1.png", width = 6000, height = 6000, units = "px", res = 600)
-aa <- ggplot(data = DT[case_ == TRUE]) +
-  # geom_point(aes(propLichen, sl_/2,
-  #               group = IDYr,
-  #               color = "#f1a340")) +
-  # geom_point(aes(propForest, sl_/2,
-  #               group = IDYr,
-  #               color = "#91bfdb")) +
-  # geom_point(aes(propOpenMove, sl_/2,
-  #               group = IDYr,
-  #               color = "#5ab4ac")) +
-  geom_smooth(aes(propLichen, sl_/2,
-                  fill = "lichen", color = 'lichen'), method = 'glm') +
-  geom_smooth(aes(propForest, sl_/2,
-                  fill = "forest", color = 'forest'), method = 'glm') +
-  geom_smooth(aes(propOpenMove, sl_/2,
-                  fill = "open", color = "open"), method = 'glm') +
-  labs(x = "Proportion of habitat",
-      y = "Speed (m/hr)",
-      color = "Legend") +
-  scale_color_manual(values = colors) +
-  scale_fill_manual(values = colors) +
-  theme(
-        strip.background = element_rect(color = "black",
-                                        fill = "white",
-                                        size = 1),
-        strip.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 14, color = 'black'),
-        axis.text = element_text(size = 12, color = 'black'),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size = 1)) 
-  
-#   #ggtitle("A)") +
-#   geom_hline(yintercept = 0, lty = 2) +
-#   facet_wrap(~category)
-  
-bb <- ggplot() +
-  geom_line(data = df_id[socvar == 'EndDist'], 
-            aes(x, rss_total, 
-                group = IDYr, 
-                color = habvar), 
-            lty = 1, 
-            lwd = 0.1) +
-  geom_smooth(data = df_id[socvar == 'EndDist'], 
-              aes(x, rss_total, 
-                  group = habvar, 
-                  color = habvar), se = F) +
-  # geom_line(data = step_ssf_pop_NN, 
-  #           aes(env,rss, 
-  #               color = category), 
-  #           lty = 1, 
-  #           lwd = 1) +
-  scale_color_manual(values = c("#f1a340", "#91bfdb", "#5ab4ac")) +
-  ylab("log(relative selection strength)") +
-  xlab("Nearest Neighbour distance (m)") +
-  #ggtitle("B)") +
-  geom_hline(yintercept = 0, lty = 2) +
-  theme(legend.position = 'none',
-        strip.background = element_rect(color = "black", 
-                                        fill = "white", 
-                                        size = 1),
-        strip.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 14, color = 'black'),
-        axis.text = element_text(size = 12, color = 'black'),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill=NA, size = 1))+
-  facet_wrap(~habvar)
-
-cc <- ggplot() +
-  geom_line(data = df_id[socvar == 'sri'], 
-            aes(x, rss_total, 
-                group = IDYr, 
-                color = habvar), 
-            lty = 1, 
-            lwd = 0.1) +
-  geom_smooth(data = df_id[socvar == 'sri'], 
-              aes(x, rss_total, 
-                  group = habvar, 
-                  color = habvar), se = F) +
-  # geom_line(data = step_ssf_pop_sri, 
-  #           aes(env, rss, 
-  #               color = category), 
-  #           lty = 1, 
-  #           lwd = 1) +
-  scale_color_manual(values = c("#f1a340", "#91bfdb", "#5ab4ac")) +
-  ylab("log(relative selection strength)") +
-  xlab("Simple ratio index") +
-  #ggtitle('C)') +
-  geom_hline(yintercept = 0, lty = 2) +
-  theme(legend.position = 'none',
-        strip.background = element_rect(color = "black", 
-                                        fill = "white", 
-                                        size = 1),
-        strip.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 14, color = 'black'),
-        axis.text = element_text(size = 12, color = 'black'),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill=NA, size = 1)) +
-  facet_wrap(~habvar)
-  
-gridExtra::grid.arrange(aa, bb, cc, nrow = 3)
-dev.off()
 
 ggplot() +
   geom_line(data = df_pop, 
