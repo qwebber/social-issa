@@ -8,8 +8,8 @@ lapply(libs, require, character.only = TRUE)
 
 # Load data
 DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
-sri_ssf <- readRDS("output/issa models/3-SRI_issa_rdm.RDS")
-summary(sri_ssf)
+sri_ssf <- readRDS("output/issa models/SRI_issa_rdm.RDS")
+NN_ssf <- readRDS("output/issa models/NN_issa_rdm.RDS")
 
 DT[, .N, by = c("IDYr")]
 
@@ -18,13 +18,6 @@ DT$Use[DT$case_ == "FALSE"] <- 0
 
 ## number of groups
 length(unique(DT[iter == 1]$groupEnd))
-
-## open areas as the reference category
-#DT$habitat[DT$habitat == "openMove"] = "aOpenMove"
-
-# ## subset to only observed individuals
-# DT <- DT[iter == 1]
-
 
 #### RSS functions ####
 ### POP ###
@@ -40,7 +33,7 @@ p.pop <- function(DT, mod, habvar, habvalue, socvar, socvalue){
         propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen, na.rm = T)),
         propForest = ifelse(habvar == 'forest', habvalue, mean(propForest, na.rm = T)),
         StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist, na.rm = T)),  
-        #sri = ifelse(socvar == 'sri', seq(0, 1, length.out = 100), mean(sri, na.rm = T)),
+        sri = ifelse(socvar == 'sri', seq(0, 1, length.out = 100), mean(sri, na.rm = T)),
         EndDist = ifelse(socvar == 'EndDist', 1:500, mean(EndDist, na.rm = T)),
         caribou_step_id_ = NA,
         IDYr = NA
@@ -66,8 +59,8 @@ p.indiv <- function(ids, DT, mod, habvar, habvalue, socvar, socvalue){
           propLichen = ifelse(habvar == 'lichen', habvalue, mean(propLichen, na.rm = T)),
           propForest = ifelse(habvar == 'forest', habvalue, mean(propForest, na.rm = T)),
           StartDist = ifelse(socvar == 'StartDist', socvalue, mean(StartDist, na.rm = T)),  
-          #sri = if(socvar == 'sri') seq(0, 1, length.out = 100)
-          #else mean(sri, na.rm = T),
+          sri = if(socvar == 'sri') seq(0, 1, length.out = 100)
+          else mean(sri, na.rm = T),
           EndDist = if(socvar == 'EndDist') 1:500 
           else mean(EndDist, na.rm = T),
           caribou_step_id_ = NA,
@@ -86,7 +79,9 @@ p.indiv <- function(ids, DT, mod, habvar, habvalue, socvar, socvalue){
 # list caribou
 caribouID <- unique(as.character(DT$IDYr))
 
-
+#############################################   
+############### SRI RSS #####################
+#############################################   
 
 # habitat 2
 hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
@@ -101,7 +96,7 @@ hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
         propLichen = mean(propLichen, na.rm = T),
         propForest = mean(propForest, na.rm = T),
         StartDist = mean(StartDist, na.rm = T),  
-        #sri = mean(sri, na.rm = T),
+        sri = mean(sri, na.rm = T),
         EndDist = mean(EndDist, na.rm = T),
         caribou_step_id_ = NA,
         IDYr = i
@@ -112,9 +107,8 @@ hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
     IDYr = i)]
   # )
 }))
-  # rbindlist(p.indiv(ids=caribouID, DT=DT, mod = sri_ssf,
-  #                         habvar = NULL, habvalue = NULL,
-  #                         socvar = NULL, socvalue = NULL))
+
+
 ## lichen
 lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
@@ -128,7 +122,7 @@ lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
         propLichen = 0.75,
         propForest = mean(propForest, na.rm = T),
         StartDist = mean(StartDist, na.rm = T),  
-        #sri = mean(sri, na.rm = T),
+        sri = mean(sri, na.rm = T),
         EndDist = mean(EndDist, na.rm = T),
         caribou_step_id_ = NA,
         IDYr = i
@@ -140,8 +134,6 @@ lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   # )
 }))
 lichen_rss <- lichen_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
-
-
 
 ## forest
 forest_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
@@ -196,96 +188,176 @@ open_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
 }))
 open_rss <- open_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
 
-
-
-####  NN RSS by ID ####
-lichen_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'lichen', habvalue = 0.75, socvar = 'EndDist', socvalue = 1:500)
-#lichen_pred_s1_NN_pop <- p.pop(DT, mod = sri_ssf, var = 'EndDist', value = 1:500, habitat = 'openForage')
-forest_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'forest', habvalue = 0.75, socvar = 'EndDist', socvalue = 1:500)
-open_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'open', habvalue = 0.75, socvar = 'EndDist', socvalue = 1:500)
-
-
-lichen_NN_rss <- merge(rbindlist(lichen_pred_s1_NN), lichen_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
-lichen_NN_rss[,rss:=hab-h2]
-setkey(lichen_rss, IDYr)
-setkey(lichen_NN_rss, IDYr)
-lichen_NN_rss <- merge(lichen_NN_rss, lichen_rss[.(IDYr, rss_hab = rss)], by = 'IDYr')
-lichen_NN_rss[,rss_total:= rss.x + rss_hab]
-
-
-forest_NN_rss <- merge(rbindlist(forest_pred_s1_NN), forest_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
-forest_NN_rss[,rss:=hab-h2]
-setkey(forest_rss, IDYr)
-setkey(forest_NN_rss, IDYr)
-forest_NN_rss <- merge(forest_NN_rss, forest_rss[.(IDYr, rss_hab = rss)], by = 'IDYr')
-forest_NN_rss[,rss_total:= rss.x + rss_hab]
-
-open_NN_rss <- merge(rbindlist(open_pred_s1_NN), open_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
-open_NN_rss[,rss:=hab-h2]
-setkey(open_rss, IDYr)
-setkey(open_NN_rss, IDYr)
-open_NN_rss <- merge(open_NN_rss, open_rss[.(IDYr, rss_hab = rss)], by = 'IDYr')
-open_NN_rss[,rss_total:= rss.x + rss_hab]
-
-
 ####  sri RSS by ID ####
 lichen_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'lichen', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
-#lichen_pred_s1_NN_pop <- p.pop(DT, mod = sri_ssf, var = 'EndDist', value = 1:500, habitat = 'openForage')
 forest_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'forest', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
 open_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'open', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
 
 lichen_sri_rss <- merge(rbindlist(lichen_pred_s1_sri), lichen_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
 lichen_sri_rss[,rss:=hab-h2]
 setkey(lichen_sri_rss, IDYr)
-lichen_sri_rss <- merge(lichen_sri_rss, lichen_rss[.(IDYr, rss_hab = rss)], by = 'IDYr')
-lichen_sri_rss[,rss_total:= rss.x + rss_hab]
-
+setnames(lichen_rss, "rss", "rss_hab")
+lichen_sri_rss <- merge(lichen_sri_rss, lichen_rss, by = 'IDYr')
+lichen_sri_rss[,rss_total:= rss + rss_hab]
 
 forest_sri_rss <- merge(rbindlist(forest_pred_s1_sri), forest_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
 forest_sri_rss[,rss:=hab-h2]
 setkey(forest_sri_rss, IDYr)
-forest_sri_rss <- merge(forest_sri_rss, forest_rss[.(IDYr, rss_hab = rss)], by = 'IDYr')
-forest_sri_rss[,rss_total:= rss.x + rss_hab]
+setnames(forest_rss, "rss", "rss_hab")
+forest_sri_rss <- merge(forest_sri_rss, forest_rss, by = 'IDYr')
+forest_sri_rss[,rss_total:= rss + rss_hab]
 
 open_sri_rss <- merge(rbindlist(open_pred_s1_sri), open_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
 open_sri_rss[,rss:=hab-h2]
 setkey(open_sri_rss, IDYr)
-open_sri_rss <- merge(open_sri_rss, open_rss[.(IDYr, rss_hab = rss)], by = 'IDYr')
-open_sri_rss[,rss_total:= rss.x + rss_hab]
-
-
-
+setnames(open_rss, "rss", "rss_hab")
+open_sri_rss <- merge(open_sri_rss, open_rss, by = 'IDYr')
+open_sri_rss[,rss_total:= rss + rss_hab]
 
 
 #### collect all RSS ####
-df_id <- rbind(lichen_NN_rss ,forest_NN_rss, open_NN_rss,
-               lichen_sri_rss ,forest_sri_rss, open_sri_rss)
-df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss.x, rss_hab, rss_total)]
-saveRDS(df_id, "output/11-RSS-ID.RDS")
-df_pop <- rbind(step_ssf_pop ,step_ssf_pop_NN, step_ssf_pop_sri)
-saveRDS(df_pop, "output/11-RSS-POP.RDS")
+df_id <- rbind(lichen_sri_rss ,forest_sri_rss, open_sri_rss)
+df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss, rss_hab, rss_total)]
+saveRDS(df_id, "output/11-SRI-RSS-ID.RDS")
+
+#############################################   
+############### NN RSS #####################
+#############################################   
+
+# habitat 2
+hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
+  #unique(
+  DT[
+    ,.(h2 = predict(
+      NN_ssf,
+      newdata = .SD[, .(
+        sl_ = mean(sl_),
+        ta_ = mean(ta_),
+        propOpenMove = mean(propOpenMove, na.rm = T),
+        propLichen = mean(propLichen, na.rm = T),
+        propForest = mean(propForest, na.rm = T),
+        StartDist = mean(StartDist, na.rm = T),  
+        sri = mean(sri, na.rm = T),
+        EndDist = mean(EndDist, na.rm = T),
+        caribou_step_id_ = NA,
+        IDYr = i
+      )],
+      type = "link",
+      re.form = NULL
+    ), 
+    IDYr = i)]
+  # )
+}))
 
 
+## lichen
+lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
+  #unique(
+  DT[
+    ,.(hab = predict(
+      NN_ssf,
+      newdata = .SD[, .(
+        sl_ = mean(sl_),
+        ta_ = mean(ta_),
+        propOpenMove = mean(propOpenMove, na.rm = T),
+        propLichen = 0.75,
+        propForest = mean(propForest, na.rm = T),
+        StartDist = mean(StartDist, na.rm = T),  
+        sri = mean(sri, na.rm = T),
+        EndDist = mean(EndDist, na.rm = T),
+        caribou_step_id_ = NA,
+        IDYr = i
+      )],
+      type = "link",
+      re.form = NULL
+    ), 
+    IDYr = i)]
+  # )
+}))
+lichen_rss <- lichen_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
 
-ggplot() +
-  geom_line(data = df_pop, 
-            aes(env, rss, 
-                color = category), 
-            lty = 1, 
-            lwd = 1) +
-  scale_color_manual(values = c("#f1a340", "#91bfdb", "#5ab4ac")) +
-  ylab("log(relative selection strength)") +
-  #xlab("Simple ratio index") +
-  #ggtitle('C)') +
-  geom_hline(yintercept = 0, lty = 2) +
-  theme(#legend.position = 'none',
-        strip.background = element_rect(color = "black", 
-                                        fill = "white", 
-                                        size = 1),
-        strip.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 14, color = 'black'),
-        axis.text = element_text(size = 12, color = 'black'),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill=NA, size = 1)) +
-  facet_wrap(~mod, scale = "free")
+## forest
+forest_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
+  #unique(
+  DT[
+    ,.(hab = predict(
+      NN_ssf,
+      newdata = .SD[, .(
+        sl_ = mean(sl_),
+        ta_ = mean(ta_),
+        propOpenMove = mean(propOpenMove, na.rm = T),
+        propLichen = mean(propLichen, na.rm = T),
+        propForest = 0.75,
+        StartDist = mean(StartDist, na.rm = T),  
+        sri = mean(sri, na.rm = T),
+        EndDist = mean(EndDist, na.rm = T),
+        caribou_step_id_ = NA,
+        IDYr = i
+      )],
+      type = "link",
+      re.form = NULL
+    ), 
+    IDYr = i)]
+  # )
+}))
+forest_rss <- forest_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
+
+
+### open
+open_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
+  #unique(
+  DT[
+    ,.(hab = predict(
+      NN_ssf,
+      newdata = .SD[, .(
+        sl_ = mean(sl_),
+        ta_ = mean(ta_),
+        propOpenMove = 0.75,
+        propLichen = mean(propLichen, na.rm = T),
+        propForest = mean(propForest, na.rm = T),
+        StartDist = mean(StartDist, na.rm = T),  
+        sri = mean(sri, na.rm = T),
+        EndDist = mean(EndDist, na.rm = T),
+        caribou_step_id_ = NA,
+        IDYr = i
+      )],
+      type = "link",
+      re.form = NULL
+    ), 
+    IDYr = i)]
+  # )
+}))
+open_rss <- open_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
+
+####  NN RSS by ID ####
+lichen_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = NN_ssf, habvar = 'lichen', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
+forest_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = NN_ssf, habvar = 'forest', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
+open_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = NN_ssf, habvar = 'open', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
+
+lichen_NN_rss <- merge(rbindlist(lichen_pred_s1_NN), lichen_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
+lichen_NN_rss[,rss:=hab-h2]
+setkey(lichen_NN_rss, IDYr)
+setnames(lichen_rss, "rss", "rss_hab")
+lichen_NN_rss <- merge(lichen_NN_rss, lichen_rss, by = 'IDYr')
+lichen_NN_rss[,rss_total:= rss + rss_hab]
+
+forest_NN_rss <- merge(rbindlist(forest_pred_s1_NN), forest_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
+forest_NN_rss[,rss:=hab-h2]
+setkey(forest_NN_rss, IDYr)
+setnames(forest_rss, "rss", "rss_hab")
+forest_NN_rss <- merge(forest_NN_rss, forest_rss, by = 'IDYr')
+forest_NN_rss[,rss_total:= rss + rss_hab]
+
+open_NN_rss <- merge(rbindlist(open_pred_s1_NN), open_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
+open_NN_rss[,rss:=hab-h2]
+setkey(open_NN_rss, IDYr)
+setnames(open_rss, "rss", "rss_hab")
+open_NN_rss <- merge(open_NN_rss, open_rss, by = 'IDYr')
+open_NN_rss[,rss_total:= rss + rss_hab]
+
+#### collect all RSS ####
+df_id <- rbind(lichen_NN_rss ,forest_NN_rss, open_NN_rss)
+df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss, rss_hab, rss_total)]
+saveRDS(df_id, "output/11-NN-RSS-ID.RDS")
+
+
