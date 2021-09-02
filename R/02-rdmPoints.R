@@ -11,6 +11,8 @@ lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
 DT <- readRDS("output/location-data/1-clean-all.RDS")
+lcFogo <- raster("../fogo_coyote_repeat/data/raw-data/Landcover/FogoSDSS_RS.tif") # This is a landcover map with different habitat types
+Legend <- fread("../fogo_coyote_repeat/data/raw-data/Landcover/Legend.csv") 
 
 DT <- DT[!is.na(season)]
 
@@ -56,7 +58,7 @@ r1[, Value := ExtractPoints(matrix(c(x2_, y2_), ncol = 2),
 r1 <- merge(r1, Legend, by = 'Value')
 
 ## check number of fixes by habitat type: 
-r1[, .N, by = "habitat"]
+r1[, .N, by = "Cover"]
 
 ##### Landcover Fogo
 lcFogo[is.na(lcFogo)] <- 10
@@ -80,9 +82,9 @@ LichenFogo ## Lichen stays the same
 ### to problems with autocorrelation.-MPL
 
 ## Fogo
-openMoveBuffFogo <- focalWeight(openMoveFogo, d = 100, type='circle')
-ForestBuffFogo <- focalWeight(ForestFogo, d = 100, type='circle')
-LichenBuffFogo <- focalWeight(LichenFogo, d = 100, type='circle')
+openMoveBuffFogo <- focalWeight(openMoveFogo, d = 200, type='circle')
+ForestBuffFogo <- focalWeight(ForestFogo, d = 200, type='circle')
+LichenBuffFogo <- focalWeight(LichenFogo, d = 200, type='circle')
 
 openMoveBuff100Fogo <- focal(openMoveFogo,openMoveBuffFogo,na.rm=TRUE,pad=TRUE,padValue=0)
 ForestBuff100Fogo <- focal(ForestFogo,ForestBuffFogo,na.rm=TRUE,pad=TRUE,padValue=0)
