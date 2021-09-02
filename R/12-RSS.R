@@ -218,7 +218,7 @@ open_sri_rss[,rss_total:= rss + rss_hab]
 #### collect all RSS ####
 df_id <- rbind(lichen_sri_rss ,forest_sri_rss, open_sri_rss)
 df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss, rss_hab, rss_total)]
-saveRDS(df_id, "output/11-SRI-RSS-ID.RDS")
+saveRDS(df_id, "output/issa modoels/11-SRI-RSS-ID.RDS")
 
 #############################################   
 ############### NN RSS #####################
@@ -358,6 +358,6 @@ open_NN_rss[,rss_total:= rss + rss_hab]
 #### collect all RSS ####
 df_id <- rbind(lichen_NN_rss ,forest_NN_rss, open_NN_rss)
 df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss, rss_hab, rss_total)]
-saveRDS(df_id, "output/11-NN-RSS-ID.RDS")
+saveRDS(df_id, "output/issa modoels/11-NN-RSS-ID.RDS")
 
 
