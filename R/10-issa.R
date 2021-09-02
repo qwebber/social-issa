@@ -90,10 +90,8 @@ saveRDS(SRI_issa_rdm, "output/issa models/SRI_issa_rdm.RDS")
 Modnames <- c("NN", "SRI")
 
 ##compute model selection table
-aicctable.out <- aictab(cand.set = list(NN_issa_rdm, sri_ssf), 
+aicctable.out <- aictab(cand.set = list(NN_ssf, sri_ssf), 
                         modnames = Modnames)
 
 ##compute evidence ratio
 evidence(aic.table = aicctable.out)
-
-AIC(NN_issa_rdm, SRI_issa_rdm)
