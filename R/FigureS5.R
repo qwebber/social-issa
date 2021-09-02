@@ -9,8 +9,8 @@ library(broom.mixed)
 library(glmmTMB)
 
 ## load data
-sri_ssf <- readRDS("output/issa models/3-SRI_issa_rdm.RDS")
-#summary(sri_ssf)
+sri_ssf <- readRDS("output/issa models/SRI_issa_rdm.RDS")
+
 ## pull out fixed effects
 sri_ssf2 <- broom.mixed::tidy(sri_ssf)
 
@@ -20,8 +20,7 @@ sri_ssf2$term2 <- factor(sri_ssf2$term, levels=c(rev(sri_ssf2$term)))
 sri_ssf2 <- sri_ssf2[effect == "fixed"]
 
 sri_ssf2$var_col <- c("Core", "Core", "Open", "Forest", "Lichen",
-                      "Core", "Core", "Open", "Forest", "Lichen",
-                      "Core", "Open", "Forest", "Lichen", 
+                      "Core",  "Open", "Forest", "Lichen",
                       "Core", "Open", "Forest", "Lichen")
 
 
