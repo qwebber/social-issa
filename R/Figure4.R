@@ -4,7 +4,7 @@ library(ggplot2)
 library(gridExtra)
 
 ## load RSS data
-df_id_sri <- readRDS("output/11-SRI-RSS-ID.RDS")
+df_id_sri <- readRDS("output/11-RSS-ID.RDS")
 df_id_NN <- readRDS("output/11-NN-RSS-ID.RDS")
 df_id_NN$NN <- rep(1:500, 114)
 
