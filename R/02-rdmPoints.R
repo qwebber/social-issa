@@ -11,10 +11,9 @@ lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
 DT <- readRDS("output/location-data/1-clean-all.RDS")
+DT <- DT[season == "winter"]
 lcFogo <- raster("../fogo_coyote_repeat/data/raw-data/Landcover/FogoSDSS_RS.tif") # This is a landcover map with different habitat types
 Legend <- fread("../fogo_coyote_repeat/data/raw-data/Landcover/Legend.csv") 
-
-DT <- DT[!is.na(season)]
 
 ## calculate number of fixes per IDYr
 mean(DT[, .N, by = "IDYr"]$N)
@@ -26,7 +25,6 @@ DT <- DT[order(DT$datetime),]
 DT <- DT[!is.na(datetime)]
 
 ## Variables
-utm21N <- '+proj=utm +zone=21 ellps=WGS84'
 crs = CRS("+proj=utm +zone=14 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 N <- 10
@@ -48,11 +46,14 @@ r1 <- DT[, rand_by(
   n = N,
   crs = crs
 ),
-by = ANIMAL_ID]
+by = IDYr]
 
 ## extract habitat type at end step
 r1[, Value := ExtractPoints(matrix(c(x2_, y2_), ncol = 2),
                                           raster = lcFogo)] 
+
+## convert NAs to unavailable habitat
+r1$Value[is.na(r1$Value)] <- 10
 
 ## rename habitat types
 r1 <- merge(r1, Legend, by = 'Value')
@@ -61,7 +62,7 @@ r1 <- merge(r1, Legend, by = 'Value')
 r1[, .N, by = "Cover"]
 
 ##### Landcover Fogo
-lcFogo[is.na(lcFogo)] <- 10
+#lcFogo[is.na(lcFogo)] <- 10
 WetlandFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="Wetland",1,0)))
 BroadleafFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="Broadleaf",1,0)))
 ConiferFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="ConiferForest",1,0)))
@@ -71,6 +72,7 @@ RockFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="Rocky",1
 WaterFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="Water",1,0)))
 LichenFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="Lichen",1,0)))
 AnthroFogo <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="Anthro",1,0)))
+NotAvail <- subs(lcFogo, data.frame(Legend$Value, ifelse(Legend$Cover=="NotAvail",1,0)))
 
 ## combine habitat types
 openMoveFogo <- WetlandFogo + RockFogo + WaterFogo + AnthroFogo
@@ -101,8 +103,8 @@ r1$propLichen <- raster::extract(LichenBuff100Fogo,ptsFogo)
 ## assign value to each iteration
 r1[, Year := year(t1_)]
 r1$IDYr <- paste(r1$ANIMAL_ID, r1$Year, sep = "_")
-r1[, iter := 1:(N+1), by = .(IDYr, t2_)]
+r1[, iter := rep(1:11), by = .(IDYr, t2_)]
 
-saveRDS(r1, "output/2-clean-all-rdm.RDS")
+saveRDS(r1, "output/location-data/2-clean-all-rdm-N10.RDS")
 
 
