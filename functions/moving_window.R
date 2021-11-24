@@ -6,7 +6,7 @@ moving_window <- function(df, n, by){
     
     df2 <- df[JDate >= k & JDate <= (k + 7)] 
     
-    DI = df2[, get_sri(.SD, 'ANIMAL_ID', 
+    DI = df2[, get_sri(.SD, 'IDYr', 
                  by = by)]
     DI$JDate = k
     out[[k]] = DI
