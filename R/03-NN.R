@@ -13,7 +13,7 @@ lapply(libs, require, character.only = TRUE)
 #install_local("/Users/quinnwebber/Downloads/data.table-1.12.6.zip")
 
 ### Input raw data ----
-DT <- readRDS("output/location-data/2-clean-all-rdm.RDS")
+DT <- readRDS("output/location-data/2-clean-all-rdm-N20.RDS")
 
 ## extract year
 DT$Year <- as.factor(DT$Year)
@@ -26,7 +26,6 @@ DT$timegroupStart <- DT$timegroup
 DT$timegroupEnd <- DT$timegroupStart + 1
 DT[,c("timegroup") := NULL]
 
-DT$IDYr <- as.factor(paste(DT$ANIMAL_ID, DT$Year, sep = "_"))
 DT$IDYrTimeIter <- as.factor(paste(DT$IDYr, DT$timegroupEnd, DT$iter, sep = "_"))
 #####################################################
 ############# CALCULDATE DISTANCE ##################
@@ -75,16 +74,14 @@ DT <- group_pts(
   threshold = 50,
   splitBy = c('Year', 'iter'),
   timegroup = 'timegroupEnd',
-  id = 'ANIMAL_ID',
+  id = 'IDYr',
   coords = c('x2_', 'y2_')
 )
 
 DT$groupEnd <- DT$group
 
-DT$IDYrIter <- as.factor(paste(DT$IDYr, DT$iter, sep = "_"))
-
 DT[, c("group") := NULL]
 
-saveRDS(DT, "output/3-rdm-locs-NN.RDS")
+saveRDS(DT, "output/location-data/3-rdm-locs-NN-N20.RDS")
 
 
