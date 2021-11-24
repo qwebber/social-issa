@@ -102,8 +102,7 @@ r1$propLichen <- raster::extract(LichenBuff100Fogo,ptsFogo)
 
 ## assign value to each iteration
 r1[, Year := year(t1_)]
-r1$IDYr <- paste(r1$ANIMAL_ID, r1$Year, sep = "_")
-r1[, iter := rep(1:11), by = .(IDYr, t2_)]
+r1[, iter := rep(1:N + 1), by = .(IDYr, t2_)]
 
 saveRDS(r1, "output/location-data/2-clean-all-rdm-N10.RDS")
 
