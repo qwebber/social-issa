@@ -10,9 +10,9 @@ libs <- c('data.table', 'spatsoc', 'igraph')
 lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
-fogo <- readRDS("output/location-data/3-rdm-locs-NN.RDS")
+fogo <- readRDS("output/location-data/3-rdm-locs-NN-N20.RDS")
 fogo$Year <- as.factor(fogo$Year)
-fogo$IDYrIter <- as.factor(fogo$IDYrIter)
+fogo$IDYrIter <- as.factor(paste(fogo$IDYr, fogo$iter, sep = "_"))
 
 #####################################################
 ############# CALCULATE MOVING WINDOW SRI ###########
@@ -31,11 +31,13 @@ for(i in 1:11) {
                          Year == "2017"][, moving_window(.SD, 75, 
                                                                    by = c("iter", "Year"))]
 }
+
 for(i in 1:11) {
   timeOut2018[[i]] <- fogo[iter == i & 
                          Year == "2018"][, moving_window(.SD, 75, 
                                                          by = c("iter", "Year"))]
 }
+
 for(i in 1:11) {
   timeOut2019[[i]] <- fogo[iter == i & 
                              Year == "2019"][, moving_window(.SD, 75, 
@@ -53,5 +55,5 @@ timeOut <- rbind(rbindlist(timeOut2017),
 #timeOut$membershipID1 <- as.factor(timeOut$membershipID1)
 #timeOut$membershipID2 <- as.factor(timeOut$membershipID2)
 
-saveRDS(timeOut, "output/4-sri.RDS")
+saveRDS(timeOut, "output/location-data/4-sri-N20.RDS")
 
