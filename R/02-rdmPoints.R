@@ -27,7 +27,7 @@ DT <- DT[!is.na(datetime)]
 ## Variables
 crs = CRS("+proj=utm +zone=14 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
-N <- 10
+N <- 20
 
 ## read in functions
 source("functions/ExtractPoints.R")
@@ -102,8 +102,8 @@ r1$propLichen <- raster::extract(LichenBuff100Fogo,ptsFogo)
 
 ## assign value to each iteration
 r1[, Year := year(t1_)]
-r1[, iter := rep(1:N + 1), by = .(IDYr, t2_)]
+r1[, iter := rep(1:6), by = .(IDYr, t2_)]
 
-saveRDS(r1, "output/location-data/2-clean-all-rdm-N10.RDS")
+saveRDS(r1, "output/location-data/2-clean-all-rdm-N20.RDS")
 
 
