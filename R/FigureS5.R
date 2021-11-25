@@ -9,7 +9,7 @@ library(broom.mixed)
 library(glmmTMB)
 
 ## load data
-sri_ssf <- readRDS("output/issa models/SRI_issa_rdm.RDS")
+sri_ssf <- readRDS("output/issa models/SRI_issa_20.RDS")
 
 ## pull out fixed effects
 sri_ssf2 <- broom.mixed::tidy(sri_ssf)
@@ -20,7 +20,8 @@ sri_ssf2$term2 <- factor(sri_ssf2$term, levels=c(rev(sri_ssf2$term)))
 sri_ssf2 <- sri_ssf2[effect == "fixed"]
 
 sri_ssf2$var_col <- c("Core", "Core", "Open", "Forest", "Lichen",
-                      "Core",  "Open", "Forest", "Lichen",
+                      "Core", "Core" ,"Open", "Forest", "Lichen",
+                      "Core", "Open", "Forest", "Lichen",
                       "Core", "Open", "Forest", "Lichen")
 
 
@@ -28,7 +29,7 @@ sri_ssf2$lwrCI <- sri_ssf2$estimate - sri_ssf2$std.error*1.96
 sri_ssf2$uprCI <- sri_ssf2$estimate + sri_ssf2$std.error*1.96
 
 
-png("graphics/FigS5.png", width = 5000, height = 5000, units = "px", res = 600)
+png("graphics/FigS5a.png", width = 5000, height = 5000, units = "px", res = 600)
 ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
   geom_point(aes(estimate, term2, color = var_col), 
              size = 2) +
