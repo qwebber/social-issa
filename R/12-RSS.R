@@ -8,8 +8,8 @@ lapply(libs, require, character.only = TRUE)
 
 # Load data
 DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
-sri_ssf <- readRDS("output/issa models/SRI_issa_rdm.RDS")
-NN_ssf <- readRDS("output/issa models/NN_issa_rdm.RDS")
+sri_ssf <- readRDS("output/issa models/SRI_issa_20.RDS")
+#NN_ssf <- readRDS("output/issa models/NN_issa_rdm.RDS")
 
 DT[, .N, by = c("IDYr")]
 
