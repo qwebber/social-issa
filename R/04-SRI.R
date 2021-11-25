@@ -26,19 +26,19 @@ timeOut2017 <- c()
 timeOut2018 <- c()
 timeOut2019 <- c()
 
-for(i in 1:11) {
+for(i in 1:21) {
   timeOut2017[[i]] <- fogo[iter == i & 
                          Year == "2017"][, moving_window(.SD, 75, 
                                                                    by = c("iter", "Year"))]
 }
 
-for(i in 1:11) {
+for(i in 1:21) {
   timeOut2018[[i]] <- fogo[iter == i & 
                          Year == "2018"][, moving_window(.SD, 75, 
                                                          by = c("iter", "Year"))]
 }
 
-for(i in 1:11) {
+for(i in 1:21) {
   timeOut2019[[i]] <- fogo[iter == i & 
                              Year == "2019"][, moving_window(.SD, 75, 
                                                              by = c("iter", "Year"))]
