@@ -6,7 +6,7 @@ libs <- c('data.table', 'dplyr', 'amt', 'lubridate', 'tidyr', 'ggplot2', 'glmmTM
 lapply(libs, require, character.only = TRUE)
 
 # Load data
-DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
+DT <- readRDS("output/location-data/5-rdm-locs-sri-NN-N20.RDS")
 
 DT[, .N, by = c("IDYr")]
 
@@ -20,7 +20,7 @@ length(unique(DT[iter == 1]$groupEnd))
 DT[,'caribou_step_id_'] <- paste(DT$IDYr, DT$step_id_, sep = '_')
 
 ### ISSF MODEL WITH NN
-NN_issa_rdm <- glmmTMB(case_ ~ 
+NN_20 <- glmmTMB(case_ ~ 
                           ## step length
                           I(log(sl_+1)) + 
                           I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
@@ -46,14 +46,14 @@ NN_issa_rdm <- glmmTMB(case_ ~
                         data = DT,  
                         map = list(theta=factor(c(NA,1:6))), 
                         start = list(theta=c(log(1000), seq(0,0, length.out = 6))))
-summary(NN_issa_rdm)
-check_collinearity(NN_issa_rdm)
+summary(NN_20)
+check_collinearity(NN_20)
 
-saveRDS(NN_issa_rdm, "output/issa models/NN_issa_rdm.RDS")
+saveRDS(NN_20, "output/issa models/NN_issa_20.RDS")
 
 
 ### ISSF MODEL WITH NN and SRI 
-SRI_issa_rdm <- glmmTMB(case_ ~ 
+SRI_20 <- glmmTMB(case_ ~ 
                          ## step length
                          I(log(sl_+1)) + 
                          I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
@@ -62,6 +62,10 @@ SRI_issa_rdm <- glmmTMB(case_ ~
                          propOpenMove + propForest + propLichen +
                           
                          ## social variables in interactions with movement and habitat 
+                         I(log(EndDist + 1)) + 
+                         I(log(StartDist + 1)):I(log(sl_+1)) +
+                         I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
+                    
                          I(log(sri+0.125)) +
                          I(log(sri+0.125)):I(log(sl_+1)) +
                          I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
@@ -73,24 +77,29 @@ SRI_issa_rdm <- glmmTMB(case_ ~
                           (0 + propForest:I(log(sri+0.125))| IDYr) +
                           (0 + propLichen:I(log(sri+0.125))| IDYr) +
                           (0 + I(log(sri+0.125)) | IDYr) +
-                          (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr),
+                          (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr) +
+                          (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                          (0 + propForest:I(log(EndDist+1)) | IDYr) +
+                          (0 + propLichen:I(log(EndDist+1)) | IDYr) +
+                          (0 + I(log(EndDist+1)) | IDYr) +
+                          (0 + I(log(StartDist + 1)):I(log(sl_+1)) | IDYr),
                         
                        family=poisson(), 
                        data = DT,  
-                       map = list(theta=factor(c(NA,1:6))), 
-                       start = list(theta=c(log(1000), seq(0,0, length.out = 6))))
+                       map = list(theta=factor(c(NA,1:11))), 
+                       start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
 
-summary(SRI_issa_rdm)
-check_collinearity(SRI_issa_rdm)
+summary(SRI_20)
+check_collinearity(SRI_20)
 
-saveRDS(SRI_issa_rdm, "output/issa models/SRI_issa_rdm.RDS")
+saveRDS(SRI_20, "output/issa models/SRI_issa_20.RDS")
 
 
 ##assign model names
 Modnames <- c("NN", "SRI")
 
 ##compute model selection table
-aicctable.out <- aictab(cand.set = list(NN_ssf, sri_ssf), 
+aicctable.out <- aictab(cand.set = list(NN_20, SRI_20), 
                         modnames = Modnames)
 
 ##compute evidence ratio
