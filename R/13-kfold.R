@@ -86,6 +86,7 @@ k1 <- glmmTMB(case_ ~
                 map = list(theta=factor(c(NA,1:11))), 
                 start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
   
+
 ## exclude strata in fold 2 from data 
 k2 <- glmmTMB(case_ ~ 
                 ## step length
@@ -122,7 +123,9 @@ k2 <- glmmTMB(case_ ~
               data = DT2[rand.vec != 2],  
               map = list(theta=factor(c(NA,1:11))), 
               start = list(theta=c(log(1000), seq(0,0, length.out = 11))))  
-  
+
+
+saveRDS(k2, "output/issa models/k2_issa.RDS")
 
 ## exclude strata in fold 3 from data 
 k3 <- glmmTMB(case_ ~ 
@@ -161,6 +164,7 @@ k3 <- glmmTMB(case_ ~
               map = list(theta=factor(c(NA,1:11))), 
               start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
 
+saveRDS(k3, "output/issa models/k3_issa.RDS")
 
 ## exclude strata in fold 4 from data 
 k4 <- glmmTMB(case_ ~ 
@@ -199,6 +203,7 @@ k4 <- glmmTMB(case_ ~
               map = list(theta=factor(c(NA,1:11))), 
               start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
 
+saveRDS(k4, "output/issa models/k4_issa.RDS")
 
 ## exclude strata in fold 5 from data 
 k5 <- glmmTMB(case_ ~ 
@@ -237,6 +242,9 @@ k5 <- glmmTMB(case_ ~
               map = list(theta=factor(c(NA,1:11))), 
               start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
 
+saveRDS(k5, "output/issa models/k5_issa.RDS")
+
+
 ## assign iSSF scores back to original data by fold
 for(i in 1:k){
     DT2$iSSFscores[DT2$rand.vec == i] <- exp(predict(eval(parse(text=paste("k",i,sep=""))), 
@@ -256,7 +264,7 @@ for (w in 1:k){
   q.pp <- quantile(fold$iSSFscores,probs=seq(0,1,.1)) ## computing quantiles of RSF scores
   bin <- rep(NA,length(fold$iSSFscores))
   for (j in 1:20){
-    bin[fold$iSSFscores>=q.pp[j]& fold$iSSFscores<q.pp[j+1]] = j  ## binning RSF scores (10 bins)
+    bin[fold$iSSFscores>=q.pp[j]& fold$iSSFscores<q.pp[j+1]] = j  ## binning RSF scores (20 bins)
   }
   used<-eval(parse(text=paste("fold$",resp,sep="")))
   # --------------------------------------------------------
@@ -267,7 +275,7 @@ for (w in 1:k){
   sum0 <- sum(a[,1])
   sum1 <- sum(a[,2])
   a$areaadjusted <- (a[,2] / sum1 ) / (a[,1] / sum0)
-  a$bins <- seq(1,20,by=1);a
+  a$bins <- seq(1,10,by=1);a
   rho_model[w] <- with(a,cor.test(bins,areaadjusted,method="spearm"))$estimate }
 
 
@@ -300,16 +308,18 @@ all_fold <- rbind(setDT(k1_eff)[effect == "fixed"],
                   setDT(k5_eff)[effect == "fixed"])
 
 all_fold$fold <- as.factor(all_fold$fold)
+all_fold$term2 <- rep(factor(unique(all_fold$term), levels= c(unique(rev(all_fold$term)))),5)
 
+png("graphics/FigS6.png", width = 5000, height = 5000, units = "px", res = 600)
 ggplot(data = all_fold[effect == "fixed" & term != "(Intercept)"]) +
-  geom_point(aes(estimate, term, color = fold), 
-             size = 2,
+  geom_point(aes(estimate, term2, color = fold), 
+             size = 1,
              position = position_dodge(width = 0.8)) +
-  geom_errorbar(aes(estimate, term, 
+  geom_errorbar(aes(estimate, term2, 
                     xmin = estimate - std.error*1.96, 
                     xmax = estimate + std.error*1.96,
                     color = fold), 
-                size = 0.75,
+                size = 0.5,
                 position = position_dodge(width = 0.8)) +  
   geom_vline(xintercept = 0, lty = 2) +
   geom_hline(yintercept = 1.5, lty = 2) +
@@ -323,6 +333,11 @@ ggplot(data = all_fold[effect == "fixed" & term != "(Intercept)"]) +
   geom_hline(yintercept = 9.5, lty = 2) +
   geom_hline(yintercept = 10.5, lty = 2) +
   geom_hline(yintercept = 11.5, lty = 2) +
+  geom_hline(yintercept = 12.5, lty = 2) +
+  geom_hline(yintercept = 13.5, lty = 2) +
+  geom_hline(yintercept = 14.5, lty = 2) +
+  geom_hline(yintercept = 15.5, lty = 2) +
+  geom_hline(yintercept = 16.5, lty = 2) +
   scale_y_discrete(labels = c(`I(log(sl_ + 1))` = "Step length", 
                               `propOpenMove` = "Open",
                               `propForest` = "Forest", 
@@ -341,8 +356,7 @@ ggplot(data = all_fold[effect == "fixed" & term != "(Intercept)"]) +
                               `propForest:I(log(sri + 0.125))` = "Forest : Simple ratio index",
                               `propLichen:I(log(sri + 0.125))` = "Lichen : Simple ratio index",
                               `propOpenMove:I(log(sri + 0.125))` = "Open : Simple ratio index")) +
-  #scale_color_manual(values = c("darkgray","#f1a340", "#91bfdb", "#5ab4ac"),
-  #                   labels = c("Core", "Forest", "Lichen", "Open")) +
+  scale_color_viridis_d() +
   xlab("Fixed effect coefficient estimate") + 
   ylab("") +
   theme(#legend.position = c(0.75,0.8),
@@ -354,3 +368,4 @@ ggplot(data = all_fold[effect == "fixed" & term != "(Intercept)"]) +
         panel.grid.minor = element_blank(),
         panel.background = element_blank(), 
         panel.border = element_rect(colour = "black", fill=NA, size = 1))
+dev.off()
