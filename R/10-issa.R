@@ -94,7 +94,6 @@ check_collinearity(SRI_20)
 
 saveRDS(SRI_20, "output/issa models/SRI_issa_20.RDS")
 
-
 ##assign model names
 Modnames <- c("NN", "SRI")
 
