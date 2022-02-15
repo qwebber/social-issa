@@ -29,7 +29,7 @@ sri_ssf2$lwrCI <- sri_ssf2$estimate - sri_ssf2$std.error*1.96
 sri_ssf2$uprCI <- sri_ssf2$estimate + sri_ssf2$std.error*1.96
 
 
-png("graphics/FigS5a.png", width = 5000, height = 5000, units = "px", res = 600)
+png("graphics/FigS5.png", width = 5000, height = 5000, units = "px", res = 600)
 ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
   geom_point(aes(estimate, term2, color = var_col), 
              size = 2) +
