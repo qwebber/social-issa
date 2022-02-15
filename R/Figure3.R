@@ -7,8 +7,8 @@ libs <- c('data.table', 'dplyr', 'amt', 'lubridate', 'tidyr', 'ggplot2', 'glmmTM
 lapply(libs, require, character.only = TRUE)
 
 # Load data
-DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
-sri_ssf <- readRDS("output/issa models/SRI_issa_rdm.RDS")
+DT <- readRDS("output/location-data/5-rdm-locs-sri-NN-N20.RDS")
+sri_ssf <- readRDS("output/issa models/SRI_issa_20.RDS")
 
 DT[, .N, by = c("IDYr")]
 
@@ -209,7 +209,7 @@ fig3a <- ggplot(data = move_all[Habitat == "Lichen"]) +
               method = 'glm') +
   xlab("Proportion of lichen") +
   ylab("Speed (m/hr)") +
-  ylim(0, 400) +
+  ylim(0, 600) +
   theme(legend.position = 'none', #legend.key =  element_blank(),
         strip.background = element_rect(color = "black",
                                         fill = "white",
@@ -228,7 +228,7 @@ fig3b <- ggplot(data = move_all[Habitat == "Forest"]) +
               method = 'glm') +
   xlab("Proportion of forest") +
   ylab("Speed (m/hr)") +
-  ylim(0, 400) +
+  ylim(0, 600) +
   theme(legend.position = 'none', 
         strip.background = element_rect(color = "black",
                                         fill = "white",
@@ -248,7 +248,7 @@ fig3c <- ggplot(data = move_all[Habitat == "Open"]) +
               method = 'glm') +
   xlab("Proportion of open") +
   ylab("Speed (m/hr)") +
-  ylim(0, 400) +
+  ylim(0, 600) +
   theme(legend.position = 'none', 
         strip.background = element_rect(color = "black",
                                         fill = "white",
