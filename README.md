@@ -16,7 +16,7 @@
 This repository contains the code accompanying the paper “Moving together, foraging apart: effects of the social environment on movement-integrated habitat selection”. 
 Scripts are under `R/`.  Input data are under are private as they contain sensitive locaitons of caribou, but data generated for subsequent analyses and used for figures are available under `output/`.
 
-Find the paper at: 
+Find the paper at: https://www.biorxiv.org/content/10.1101/2021.02.11.430740v2.full
 
 ## Abstract
 
