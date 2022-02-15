@@ -2,10 +2,11 @@
 ## load packages
 library(ggplot2)
 library(gridExtra)
+library(data.table)
 
 ## load RSS data
-df_id_sri <- readRDS("output/11-RSS-ID.RDS")
-df_id_NN <- readRDS("output/11-NN-RSS-ID.RDS")
+df_id_sri <- readRDS("output/issa models/11-SRI-RSS-ID.RDS")
+df_id_NN <- readRDS("output/issa models/11-NN-RSS-ID.RDS")
 df_id_NN$NN <- rep(1:500, 114)
 
 df_id_sri$habvar[df_id_sri$habvar == "forest"] <- "Forest"
@@ -15,7 +16,7 @@ df_id_NN$habvar[df_id_NN$habvar == "forest"] <- "Forest"
 df_id_NN$habvar[df_id_NN$habvar == "lichen"] <- "Lichen"
 df_id_NN$habvar[df_id_NN$habvar == "open"] <- "Open"
 
-avg <- df_id_NN[, mean(rss_total), by = c("NN", "habvar")]
+avg <- setDT(df_id_NN)[, mean(rss_total), by = c("NN", "habvar")]
 
 png("graphics/Fig4.png", width = 6000, height = 4000, units = "px", res = 600)
 aa <- ggplot() +
