@@ -7,9 +7,8 @@ libs <- c('data.table', 'dplyr', 'amt', 'lubridate', 'tidyr', 'ggplot2', 'glmmTM
 lapply(libs, require, character.only = TRUE)
 
 # Load data
-DT <- readRDS("output/location-data/5-rdm-locs-sri-NN.RDS")
-sri_ssf <- readRDS("output/issa models/SRI_issa_20.RDS")
-#NN_ssf <- readRDS("output/issa models/NN_issa_rdm.RDS")
+DT <- readRDS("output/location-data/5-rdm-locs-sri-NN-N20.RDS")
+issa <- readRDS("output/issa models/SRI_issa_20.RDS")
 
 DT[, .N, by = c("IDYr")]
 
@@ -88,7 +87,7 @@ hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(h2 = predict(
-      sri_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -108,13 +107,14 @@ hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
   # )
 }))
 
+saveRDS(hab_pred_s2, "output/issa models/RSS_hab_pred_s2.RDS")
 
 ## lichen
 lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(hab = predict(
-      sri_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -133,14 +133,21 @@ lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
     IDYr = i)]
   # )
 }))
-lichen_rss <- lichen_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
+
+saveRDS(lichen_pred_s1, "output/issa models/lichen_pred_s1.RDS")
+
+
+lichen_pred_s1 <- readRDS("output/issa models/lichen_pred_s1.RDS")
+hab_pred_s2 <- readRDS("output/issa models/RSS_hab_pred_s2.RDS")
+
+## START HERE
 
 ## forest
 forest_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(hab = predict(
-      sri_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -159,7 +166,6 @@ forest_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
     IDYr = i)]
   # )
 }))
-forest_rss <- forest_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
 
 
 ### open
@@ -167,7 +173,7 @@ open_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(hab = predict(
-      sri_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -186,12 +192,16 @@ open_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
     IDYr = i)]
   # )
 }))
+
+## calculate RSS
+lichen_rss <- lichen_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
+forest_rss <- forest_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
 open_rss <- open_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
 
 ####  sri RSS by ID ####
-lichen_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'lichen', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
-forest_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'forest', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
-open_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = sri_ssf, habvar = 'open', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
+lichen_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = issa, habvar = 'lichen', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
+forest_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = issa, habvar = 'forest', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
+open_pred_s1_sri <- p.indiv(ids = caribouID, DT, mod = issa, habvar = 'open', habvalue = 0.75, socvar = 'sri', socvalue = seq(0, 1, length.out = 100))
 
 lichen_sri_rss <- merge(rbindlist(lichen_pred_s1_sri), lichen_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
 lichen_sri_rss[,rss:=hab-h2]
@@ -218,7 +228,7 @@ open_sri_rss[,rss_total:= rss + rss_hab]
 #### collect all RSS ####
 df_id <- rbind(lichen_sri_rss ,forest_sri_rss, open_sri_rss)
 df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss, rss_hab, rss_total)]
-saveRDS(df_id, "output/issa modoels/11-SRI-RSS-ID.RDS")
+saveRDS(df_id, "output/issa models/11-SRI-RSS-ID.RDS")
 
 #############################################   
 ############### NN RSS #####################
@@ -229,7 +239,7 @@ hab_pred_s2 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(h2 = predict(
-      NN_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -255,7 +265,7 @@ lichen_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(hab = predict(
-      NN_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -281,7 +291,7 @@ forest_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(hab = predict(
-      NN_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -308,7 +318,7 @@ open_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
   #unique(
   DT[
     ,.(hab = predict(
-      NN_ssf,
+      issa,
       newdata = .SD[, .(
         sl_ = mean(sl_),
         ta_ = mean(ta_),
@@ -330,9 +340,9 @@ open_pred_s1 <- rbindlist(lapply(caribouID, function(i) {
 open_rss <- open_pred_s1[,.(IDYr, rss = hab-hab_pred_s2$h2)]
 
 ####  NN RSS by ID ####
-lichen_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = NN_ssf, habvar = 'lichen', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
-forest_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = NN_ssf, habvar = 'forest', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
-open_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = NN_ssf, habvar = 'open', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
+lichen_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = issa, habvar = 'lichen', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
+forest_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = issa, habvar = 'forest', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
+open_pred_s1_NN <- p.indiv(ids = caribouID, DT, mod = issa, habvar = 'open', habvalue = 0.75, socvar = 'EndDist', socvalue = seq(0, 1, length.out = 100))
 
 lichen_NN_rss <- merge(rbindlist(lichen_pred_s1_NN), lichen_pred_s1[,.(IDYr, h2=hab)], by = 'IDYr')
 lichen_NN_rss[,rss:=hab-h2]
@@ -358,6 +368,6 @@ open_NN_rss[,rss_total:= rss + rss_hab]
 #### collect all RSS ####
 df_id <- rbind(lichen_NN_rss ,forest_NN_rss, open_NN_rss)
 df_id <- df_id[,.(IDYr, habvar, habvalue, socvar, x = socvalue, rss_intx = rss, rss_hab, rss_total)]
-saveRDS(df_id, "output/issa modoels/11-NN-RSS-ID.RDS")
+saveRDS(df_id, "output/issa models/11-NN-RSS-ID.RDS")
 
 
