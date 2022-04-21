@@ -37,7 +37,7 @@ ggplot(DT) +
   facet_wrap(~lagYear)
 
 ### Calculate network metrics
-source("functions/dynamic_network.R")
+source("functions/dynamic_network2.R")
 
 mods <- dynamic_network(DT, id = 'ANIMAL_ID', 
                         by = c('lagYear'))
