@@ -83,26 +83,46 @@ LichenFogo ## Lichen stays the same
 ### buffer that is habitat x". Tends to make analyses more robust and less susceptible
 ### to problems with autocorrelation.-MPL
 
-## Fogo
-openMoveBuffFogo <- focalWeight(openMoveFogo, d = 200, type='circle')
-ForestBuffFogo <- focalWeight(ForestFogo, d = 200, type='circle')
-LichenBuffFogo <- focalWeight(LichenFogo, d = 200, type='circle')
+## 200m buffer
+openMoveBuffFogo200 <- focalWeight(openMoveFogo, d = 200, type='circle')
+ForestBuffFogo200 <- focalWeight(ForestFogo, d = 200, type='circle')
+LichenBuffFogo200 <- focalWeight(LichenFogo, d = 200, type='circle')
 
-openMoveBuff100Fogo <- focal(openMoveFogo,openMoveBuffFogo,na.rm=TRUE,pad=TRUE,padValue=0)
-ForestBuff100Fogo <- focal(ForestFogo,ForestBuffFogo,na.rm=TRUE,pad=TRUE,padValue=0)
-LichenBuff100Fogo <- focal(LichenFogo,LichenBuffFogo,na.rm=TRUE,pad=TRUE,padValue=0)
+openMoveBuff200Fogo <- focal(openMoveFogo,openMoveBuffFogo200,na.rm=TRUE,pad=TRUE,padValue=0)
+ForestBuff200Fogo <- focal(ForestFogo,ForestBuffFogo200,na.rm=TRUE,pad=TRUE,padValue=0)
+LichenBuff200Fogo <- focal(LichenFogo,LichenBuffFogo200,na.rm=TRUE,pad=TRUE,padValue=0)
 
 ## Proportion of habitat at end point
 ptsFogo <- SpatialPoints(data.frame(r1$x2_,r1$y2_))
 
 ## extract proportion of each habitat type
-r1$propOpenMove <- raster::extract(openMoveBuff100Fogo, ptsFogo)
-r1$propForest <- raster::extract(ForestBuff100Fogo,ptsFogo)
-r1$propLichen <- raster::extract(LichenBuff100Fogo,ptsFogo)
+r1$propOpenMove200 <- raster::extract(openMoveBuff200Fogo, ptsFogo)
+r1$propForest200 <- raster::extract(ForestBuff200Fogo,ptsFogo)
+r1$propLichen200 <- raster::extract(LichenBuff200Fogo,ptsFogo)
+
+
+## 1000m buffer
+openMoveBuffFogo1000 <- focalWeight(openMoveFogo, d = 1000, type='circle')
+ForestBuffFogo1000 <- focalWeight(ForestFogo, d = 1000, type='circle')
+LichenBuffFogo1000 <- focalWeight(LichenFogo, d = 1000, type='circle')
+
+openMoveBuff1000Fogo <- focal(openMoveFogo,openMoveBuffFogo1000,na.rm=TRUE,pad=TRUE,padValue=0)
+ForestBuff1000Fogo <- focal(ForestFogo,ForestBuffFogo1000,na.rm=TRUE,pad=TRUE,padValue=0)
+LichenBuff1000Fogo <- focal(LichenFogo,LichenBuffFogo1000,na.rm=TRUE,pad=TRUE,padValue=0)
+
+## extract proportion of each habitat type
+r1$propOpenMove1000 <- raster::extract(openMoveBuff1000Fogo, ptsFogo)
+r1$propForest1000 <- raster::extract(ForestBuff1000Fogo,ptsFogo)
+r1$propLichen1000 <- raster::extract(LichenBuff1000Fogo,ptsFogo)
 
 ## assign value to each iteration
 r1[, Year := year(t1_)]
 r1[, iter := rep(1:21), by = .(IDYr, t2_)]
+
+ggplot(r1[iter == 1]) +
+  geom_point(aes(propOpenMove1000, propOpenMove200)) +
+  ylim(0, 1) +
+  xlim(0, 1)
 
 saveRDS(r1, "output/location-data/2-clean-all-rdm-N20.RDS")
 
