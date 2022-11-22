@@ -7,8 +7,8 @@ libs <- c('data.table', 'ggplot2', 'gridExtra',
 lapply(libs, require, character.only = TRUE)
 
 ### Input data ----
-locs <- readRDS('output/1-clean-all.RDS')
-
+locs <- readRDS('output/location-data/1-clean-all.RDS')
+locs <- locs[season == "winter"]
 ### Variables ----
 utm21N <- '+proj=utm +zone=21 ellps=WGS84'
 
