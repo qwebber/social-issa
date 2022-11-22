@@ -3,12 +3,13 @@
 
 ### Packages ----
 libs <- c('data.table', 'dplyr', 'amt', 'lubridate', 'tidyr', 'ggplot2', 'glmmTMB', 'patchwork', 
-          'broom.mixed', 'raster', 'ggthemes')
+          'broom.mixed', 'raster', 'ggthemes', 'performance')
 lapply(libs, require, character.only = TRUE)
 
 # Load data
 DT <- readRDS("output/location-data/5-rdm-locs-sri-NN-N20.RDS")
 sri_ssf <- readRDS("output/issa models/SRI_issa_20.RDS")
+check_model(sri_ssf)
 
 DT[, .N, by = c("IDYr")]
 
@@ -208,7 +209,7 @@ fig3a <- ggplot(data = move_all[Habitat == "Lichen"]) +
               color = "#91bfdb", 
               method = 'glm') +
   xlab("Proportion of lichen") +
-  ylab("Speed (m/hr)") +
+  ylab("Expected displacement (m/hr)") +
   ylim(0, 600) +
   theme(legend.position = 'none', #legend.key =  element_blank(),
         strip.background = element_rect(color = "black",
@@ -227,7 +228,7 @@ fig3b <- ggplot(data = move_all[Habitat == "Forest"]) +
               color = "#f1a340", 
               method = 'glm') +
   xlab("Proportion of forest") +
-  ylab("Speed (m/hr)") +
+  ylab("Expected displacement (m/hr)") +
   ylim(0, 600) +
   theme(legend.position = 'none', 
         strip.background = element_rect(color = "black",
@@ -247,7 +248,7 @@ fig3c <- ggplot(data = move_all[Habitat == "Open"]) +
               color = "#5ab4ac", 
               method = 'glm') +
   xlab("Proportion of open") +
-  ylab("Speed (m/hr)") +
+  ylab("Expected displacement (m/hr)") +
   ylim(0, 600) +
   theme(legend.position = 'none', 
         strip.background = element_rect(color = "black",
