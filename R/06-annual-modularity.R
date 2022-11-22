@@ -11,10 +11,10 @@ lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
 DT <- readRDS("output/location-data/1-clean-all.RDS")
+DT <- DT[season == "winter"]
 
 DT[, .N, by = "IDYr"]
 
-#DT <- DT[season == "winter"]
 
 ###### GENERATE NETWORKS FOR OBSERVED DATA ######
 
@@ -54,4 +54,4 @@ mods2 <- mods[,c("IDLagYr", "membership")]
 
 DT2 <- merge(mods2, DT, by = "IDLagYr")
 
-saveRDS(DT2, "output/7-locs-mod.RDS")
+saveRDS(DT2, "output/location-data/7-locs-mod.RDS")
