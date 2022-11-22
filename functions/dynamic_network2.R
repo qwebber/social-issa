@@ -35,9 +35,9 @@ dynamic_network <- function(DT = NULL, id = NULL, by = NULL) {
     
     list(
       strength = igraph::strength(gbi.grph_df),
-      Q = igraph::modularity(cluster_walktrap(gbi.grph_df)),
+      Q = igraph::modularity(cluster_fast_greedy(gbi.grph_df)),
       gDen = graph.density(gbi.grph_df),
-      membership = membership(cluster_walktrap(gbi.grph_df)),
+      membership = membership(cluster_fast_greedy(gbi.grph_df)),
       ID = names(igraph::degree(gbi.grph_df))
     )
   }, by = by]
