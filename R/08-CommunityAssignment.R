@@ -52,7 +52,8 @@ sumStats = data.table(N = c(length(unique(fogo17$ANIMAL_ID)),
           rc = c(rc_fogo2017, rc_fogo2018, rc_fogo2019),
           Q = c(mean(obs[lagYear == "Year1"]$Q),
                 mean(obs[lagYear == "Year2"]$Q),
-                mean(obs[lagYear == "Year3"]$Q)),
-         obs[, uniqueN(membership), by = c("lagYear")])
+                mean(obs[lagYear == "Year3"]$Q)))
  
+obs[, uniqueN(ID), by = c("lagYear", "membership")]
+
 saveRDS(sumStats, "output/8-rcom.RDS")
