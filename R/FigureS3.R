@@ -7,6 +7,8 @@
 
 library(ggplot2)
 library(dplyr)
+library(sf)
+library(ggspatial)
 
 verticesFogo <- readRDS("output/vertices/verticesFogoCommunity.RDS")
 
@@ -49,8 +51,6 @@ png("graphics/FigS3.png", width = 5000, height = 3000, units = "px", res = 500)
 ggplot() + 
     geom_sf(data = islands, fill = islandcol, size = 0.13, color = coastcol) + 
     geom_sf(data = output, aes(fill = membership,  group = group), alpha = 0.25) + 
-    annotation_north_arrow(location = "tr", which_north = "true", 
-                         style = north_arrow_minimal) +
     themeMap +
     theme(axis.text = element_text(size = 11, color = 'black')) +
     scale_y_continuous(label = function(x) sprintf('%.2f°N', x)) +
