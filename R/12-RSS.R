@@ -3,12 +3,15 @@
 
 ### Packages ----
 libs <- c('data.table', 'dplyr', 'amt', 'lubridate', 'tidyr', 'ggplot2', 'glmmTMB', 'patchwork', 
-          'broom.mixed', 'raster', 'ggthemes')
+          'broom.mixed', 'raster', 'ggthemes', 'performance', 'AICcmodavg')
 lapply(libs, require, character.only = TRUE)
 
 # Load data
 DT <- readRDS("output/location-data/5-rdm-locs-sri-NN-N20.RDS")
 issa <- readRDS("output/issa models/SRI_issa_20.RDS")
+check_collinearity(issa)
+
+
 
 DT[, .N, by = c("IDYr")]
 
