@@ -13,7 +13,7 @@ get_graph <- function(DT = NULL, id = NULL, by = NULL) {
     stop('DT, and id must be provided')
   }
   
-  DT[, {
+  #DT[, {
     d <- data.table::dcast(.SD, formula = group ~ get(id), 
                            fun.aggregate = length, value.var = 'group')
     
@@ -31,8 +31,8 @@ get_graph <- function(DT = NULL, id = NULL, by = NULL) {
                                                        diag = FALSE,
                                                        weighted = TRUE)
     
-                
+    gbi.grph_df           
     
-  }, by = by]
+  #}, by = by]
   
 }
