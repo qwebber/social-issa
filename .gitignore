@@ -3,7 +3,7 @@
 input/
 output/location-data
 output/issa models
-output/vertices
+output/vertices/fogo.mcp.RDS
 
 # R related files #
 ###################
