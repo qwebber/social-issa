@@ -7,14 +7,14 @@ library(data.table)
 ## load RSS data
 df_id_sri <- readRDS("output/issa models/11-SRI-RSS-ID.RDS")
 df_id_NN <- readRDS("output/issa models/11-NN-RSS-ID.RDS")
-df_id_NN$NN <- rep(1:500, 114)
+df_id_NN$NN <- rep(1:500, 76) ## 38 * 2 = number of individuals * # habitats
 
 df_id_sri$habvar[df_id_sri$habvar == "forest"] <- "Forest"
 df_id_sri$habvar[df_id_sri$habvar == "lichen"] <- "Lichen"
-df_id_sri$habvar[df_id_sri$habvar == "open"] <- "Open"
+#df_id_sri$habvar[df_id_sri$habvar == "open"] <- "Open"
 df_id_NN$habvar[df_id_NN$habvar == "forest"] <- "Forest"
 df_id_NN$habvar[df_id_NN$habvar == "lichen"] <- "Lichen"
-df_id_NN$habvar[df_id_NN$habvar == "open"] <- "Open"
+#df_id_NN$habvar[df_id_NN$habvar == "open"] <- "Open"
 
 avg <- setDT(df_id_NN)[, mean(rss_total), by = c("NN", "habvar")]
 
