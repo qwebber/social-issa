@@ -71,3 +71,4 @@ check_collinearity(SRI_20)
 
 saveRDS(SRI_20, "output/issa models/SRI_issa_20_2.RDS")
 
+SRI_20 <- readRDS("output/issa models/SRI_issa_20_2.RDS")
