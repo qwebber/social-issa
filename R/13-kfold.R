@@ -53,29 +53,29 @@ DT2 <- merge(setDT(data), DT, by = "caribou_step_id_")
 k1 <- glmmTMB(case_ ~ 
                 ## step length
                 I(log(sl_+1)) + 
-                I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
+                I(log(sl_+1)):(propForest + propLichen) +
                 
                 ## habitat variables
-                propOpenMove + propForest + propLichen +
+                 propForest + propLichen +
                 
                 ## social variables in interactions with movement and habitat 
                 I(log(EndDist + 1)) + 
                 I(log(StartDist + 1)):I(log(sl_+1)) +
-                I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
+                I(log(EndDist + 1)):(propForest + propLichen) + 
                 
                 I(log(sri+0.125)) +
                 I(log(sri+0.125)):I(log(sl_+1)) +
-                I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
+                I(log(sri+0.125)):(propForest + propLichen) + 
                 
                 ## random effects  
                 (1|caribou_step_id_) + 
                 (0 + I(log(sl_+1)) | IDYr) +
-                (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
+                #(0 + propOpenMove:I(log(sri+0.125))| IDYr) +
                 (0 + propForest:I(log(sri+0.125))| IDYr) +
                 (0 + propLichen:I(log(sri+0.125))| IDYr) +
                 (0 + I(log(sri+0.125)) | IDYr) +
                 (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr) +
-                (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                #(0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
                 (0 + propForest:I(log(EndDist+1)) | IDYr) +
                 (0 + propLichen:I(log(EndDist+1)) | IDYr) +
                 (0 + I(log(EndDist+1)) | IDYr) +
@@ -83,37 +83,37 @@ k1 <- glmmTMB(case_ ~
                 
                 family=poisson(), 
                 data = DT2[rand.vec != 1],  
-                map = list(theta=factor(c(NA,1:11))), 
-                start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
+                map = list(theta=factor(c(NA,1:9))), 
+                start = list(theta=c(log(1000), seq(0,0, length.out = 9))))
   
 
 ## exclude strata in fold 2 from data 
 k2 <- glmmTMB(case_ ~ 
                 ## step length
                 I(log(sl_+1)) + 
-                I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
+                I(log(sl_+1)):(propForest + propLichen) +
                 
                 ## habitat variables
-                propOpenMove + propForest + propLichen +
+                propForest + propLichen +
                 
                 ## social variables in interactions with movement and habitat 
                 I(log(EndDist + 1)) + 
                 I(log(StartDist + 1)):I(log(sl_+1)) +
-                I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
+                I(log(EndDist + 1)):(propForest + propLichen) + 
                 
                 I(log(sri+0.125)) +
                 I(log(sri+0.125)):I(log(sl_+1)) +
-                I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
+                I(log(sri+0.125)):(propForest + propLichen) + 
                 
                 ## random effects  
                 (1|caribou_step_id_) + 
                 (0 + I(log(sl_+1)) | IDYr) +
-                (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
+                #(0 + propOpenMove:I(log(sri+0.125))| IDYr) +
                 (0 + propForest:I(log(sri+0.125))| IDYr) +
                 (0 + propLichen:I(log(sri+0.125))| IDYr) +
                 (0 + I(log(sri+0.125)) | IDYr) +
                 (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr) +
-                (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                #(0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
                 (0 + propForest:I(log(EndDist+1)) | IDYr) +
                 (0 + propLichen:I(log(EndDist+1)) | IDYr) +
                 (0 + I(log(EndDist+1)) | IDYr) +
@@ -121,8 +121,8 @@ k2 <- glmmTMB(case_ ~
               
               family=poisson(), 
               data = DT2[rand.vec != 2],  
-              map = list(theta=factor(c(NA,1:11))), 
-              start = list(theta=c(log(1000), seq(0,0, length.out = 11))))  
+              map = list(theta=factor(c(NA,1:9))), 
+              start = list(theta=c(log(1000), seq(0,0, length.out = 9))))  
 
 
 saveRDS(k2, "output/issa models/k2_issa.RDS")
@@ -131,29 +131,29 @@ saveRDS(k2, "output/issa models/k2_issa.RDS")
 k3 <- glmmTMB(case_ ~ 
                 ## step length
                 I(log(sl_+1)) + 
-                I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
+                I(log(sl_+1)):(propForest + propLichen) +
                 
                 ## habitat variables
-                propOpenMove + propForest + propLichen +
+                propForest + propLichen +
                 
                 ## social variables in interactions with movement and habitat 
                 I(log(EndDist + 1)) + 
                 I(log(StartDist + 1)):I(log(sl_+1)) +
-                I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
+                I(log(EndDist + 1)):(propForest + propLichen) + 
                 
                 I(log(sri+0.125)) +
                 I(log(sri+0.125)):I(log(sl_+1)) +
-                I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
+                I(log(sri+0.125)):(propForest + propLichen) + 
                 
                 ## random effects  
                 (1|caribou_step_id_) + 
                 (0 + I(log(sl_+1)) | IDYr) +
-                (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
+                #(0 + propOpenMove:I(log(sri+0.125))| IDYr) +
                 (0 + propForest:I(log(sri+0.125))| IDYr) +
                 (0 + propLichen:I(log(sri+0.125))| IDYr) +
                 (0 + I(log(sri+0.125)) | IDYr) +
                 (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr) +
-                (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                #(0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
                 (0 + propForest:I(log(EndDist+1)) | IDYr) +
                 (0 + propLichen:I(log(EndDist+1)) | IDYr) +
                 (0 + I(log(EndDist+1)) | IDYr) +
@@ -161,8 +161,8 @@ k3 <- glmmTMB(case_ ~
               
               family=poisson(), 
               data = DT2[rand.vec != 3],  
-              map = list(theta=factor(c(NA,1:11))), 
-              start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
+              map = list(theta=factor(c(NA,1:9))), 
+              start = list(theta=c(log(1000), seq(0,0, length.out = 9))))
 
 saveRDS(k3, "output/issa models/k3_issa.RDS")
 
@@ -170,29 +170,29 @@ saveRDS(k3, "output/issa models/k3_issa.RDS")
 k4 <- glmmTMB(case_ ~ 
                 ## step length
                 I(log(sl_+1)) + 
-                I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
+                I(log(sl_+1)):(propForest + propLichen) +
                 
                 ## habitat variables
-                propOpenMove + propForest + propLichen +
+                propForest + propLichen +
                 
                 ## social variables in interactions with movement and habitat 
                 I(log(EndDist + 1)) + 
                 I(log(StartDist + 1)):I(log(sl_+1)) +
-                I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
+                I(log(EndDist + 1)):(propForest + propLichen) + 
                 
                 I(log(sri+0.125)) +
                 I(log(sri+0.125)):I(log(sl_+1)) +
-                I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
+                I(log(sri+0.125)):(propForest + propLichen) + 
                 
                 ## random effects  
                 (1|caribou_step_id_) + 
                 (0 + I(log(sl_+1)) | IDYr) +
-                (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
+                #(0 + propOpenMove:I(log(sri+0.125))| IDYr) +
                 (0 + propForest:I(log(sri+0.125))| IDYr) +
                 (0 + propLichen:I(log(sri+0.125))| IDYr) +
                 (0 + I(log(sri+0.125)) | IDYr) +
                 (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr) +
-                (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                #(0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
                 (0 + propForest:I(log(EndDist+1)) | IDYr) +
                 (0 + propLichen:I(log(EndDist+1)) | IDYr) +
                 (0 + I(log(EndDist+1)) | IDYr) +
@@ -200,8 +200,8 @@ k4 <- glmmTMB(case_ ~
               
               family=poisson(), 
               data = DT2[rand.vec != 4],  
-              map = list(theta=factor(c(NA,1:11))), 
-              start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
+              map = list(theta=factor(c(NA,1:9))), 
+              start = list(theta=c(log(1000), seq(0,0, length.out = 9))))
 
 saveRDS(k4, "output/issa models/k4_issa.RDS")
 
@@ -209,29 +209,29 @@ saveRDS(k4, "output/issa models/k4_issa.RDS")
 k5 <- glmmTMB(case_ ~ 
                 ## step length
                 I(log(sl_+1)) + 
-                I(log(sl_+1)):(propOpenMove + propForest + propLichen) +
+                I(log(sl_+1)):(propForest + propLichen) +
                 
                 ## habitat variables
-                propOpenMove + propForest + propLichen +
+                propForest + propLichen +
                 
                 ## social variables in interactions with movement and habitat 
                 I(log(EndDist + 1)) + 
                 I(log(StartDist + 1)):I(log(sl_+1)) +
-                I(log(EndDist + 1)):(propOpenMove + propForest + propLichen) + 
+                I(log(EndDist + 1)):(propForest + propLichen) + 
                 
                 I(log(sri+0.125)) +
                 I(log(sri+0.125)):I(log(sl_+1)) +
-                I(log(sri+0.125)):(propOpenMove + propForest + propLichen) + 
+                I(log(sri+0.125)):(propForest + propLichen) + 
                 
                 ## random effects  
                 (1|caribou_step_id_) + 
                 (0 + I(log(sl_+1)) | IDYr) +
-                (0 + propOpenMove:I(log(sri+0.125))| IDYr) +
+                #(0 + propOpenMove:I(log(sri+0.125))| IDYr) +
                 (0 + propForest:I(log(sri+0.125))| IDYr) +
                 (0 + propLichen:I(log(sri+0.125))| IDYr) +
                 (0 + I(log(sri+0.125)) | IDYr) +
                 (0 + I(log(sl_+1)):I(log(sri+0.125))| IDYr) +
-                (0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
+                #(0 + propOpenMove:I(log(EndDist+1)) | IDYr) +
                 (0 + propForest:I(log(EndDist+1)) | IDYr) +
                 (0 + propLichen:I(log(EndDist+1)) | IDYr) +
                 (0 + I(log(EndDist+1)) | IDYr) +
@@ -239,8 +239,8 @@ k5 <- glmmTMB(case_ ~
               
               family=poisson(), 
               data = DT2[rand.vec != 5],  
-              map = list(theta=factor(c(NA,1:11))), 
-              start = list(theta=c(log(1000), seq(0,0, length.out = 11))))
+              map = list(theta=factor(c(NA,1:9))), 
+              start = list(theta=c(log(1000), seq(0,0, length.out = 9))))
 
 saveRDS(k5, "output/issa models/k5_issa.RDS")
 
