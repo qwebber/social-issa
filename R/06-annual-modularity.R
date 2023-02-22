@@ -36,7 +36,7 @@ ggplot(DT) +
   geom_point(aes(EASTING, NORTHING, color = ANIMAL_ID)) +
   facet_wrap(~lagYear)
 
-### Calculate network metrics
+#### Calculate network metrics ####
 source("functions/dynamic_network2.R")
 
 mods <- dynamic_network(DT, id = 'ANIMAL_ID', 
@@ -50,7 +50,7 @@ mods$Year[mods$lagYear == "Year3"] <- "2019"
 mods$IDLagYr <- as.factor(paste(mods$ID1, mods$lagYear, sep = "_"))
 mods2 <- mods[,c("IDLagYr", "membership")]
 
-### merge community assignment to DT file
+#### merge community assignment to DT file ####
 
 DT2 <- merge(mods2, DT, by = "IDLagYr")
 
