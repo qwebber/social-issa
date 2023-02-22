@@ -45,7 +45,7 @@ ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
                 size = 0.75) +  
   geom_vline(xintercept = 0, lty = 2) +
   scale_y_discrete(labels = c(`I(log(sl_ + 1))` = "Step length", 
-                              `propOpenMove` = "Open",
+                              #`propOpenMove` = "Open",
                               `propForest` = "Forest", 
                               `propLichen` = "Lichen",
                               `I(log(EndDist + 1))` = "Nearest neighbour (end)", 
@@ -53,20 +53,20 @@ ggplot(data = sri_ssf2[effect == "fixed" & term != "(Intercept)"]) +
                               `I(log(sri + 0.125))` = "Simple ratio index", 
                               `I(log(sl_ + 1)):propForest` = "Step length : Forest", 
                               `I(log(sl_ + 1)):propLichen` = "Step length : Lichen", 
-                              `I(log(sl_ + 1)):propOpenMove` = "Step length : Open", 
+                              #`I(log(sl_ + 1)):propOpenMove` = "Step length : Open", 
                               `I(log(sl_ + 1)):I(log(StartDist + 1))` = "Step length : Nearest neigbhour (start)",
                               `propForest:I(log(EndDist + 1))` = "Forest : Nearest neighbour (end)",
                               `propLichen:I(log(EndDist + 1))` = "Lichen : Nearest neighbour (end)",
-                              `propOpenMove:I(log(EndDist + 1))` = "Open : Nearest neighbour (end)",
+                              #`propOpenMove:I(log(EndDist + 1))` = "Open : Nearest neighbour (end)",
                               `I(log(sl_ + 1)):I(log(sri + 0.125))` = "Step length : Simple ratio index",
                               `propForest:I(log(sri + 0.125))` = "Forest : Simple ratio index",
-                              `propLichen:I(log(sri + 0.125))` = "Lichen : Simple ratio index",
-                              `propOpenMove:I(log(sri + 0.125))` = "Open : Simple ratio index")) +
+                              `propLichen:I(log(sri + 0.125))` = "Lichen : Simple ratio index")) +
+                              #`propOpenMove:I(log(sri + 0.125))` = "Open : Simple ratio index")) +
   scale_color_manual(values = c("darkgray","#f1a340", "#91bfdb", "#5ab4ac"),
                      labels = c("Core", "Forest", "Lichen", "Open")) +
   xlab("Fixed effect coefficient estimate") + 
   ylab("") +
-  theme(legend.position = c(0.75,0.8),
+  theme(legend.position = c(0.9,0.8),
         legend.title = element_blank(),
         legend.key = element_blank(),
         legend.text = element_text(size = 10),
