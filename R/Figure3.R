@@ -8,8 +8,8 @@ lapply(libs, require, character.only = TRUE)
 
 # Load data
 DT <- readRDS("output/location-data/5-rdm-locs-sri-NN-N20.RDS")
-sri_ssf <- readRDS("output/issa models/SRI_issa_20.RDS")
-check_model(sri_ssf)
+sri_ssf <- readRDS("output/issa models/SRI_issa_20_2.RDS")
+#check_model(sri_ssf)
 
 DT[, .N, by = c("IDYr")]
 
@@ -94,8 +94,8 @@ for(i in 1:n){
   SLForest <- fix_vals[term == "I(log(sl_ + 1)):propForest"]$estimate 
   medForest <- median(DT$propForest, na.rm = T)
   
-  SLMove <- fix_vals[term == "I(log(sl_ + 1)):propOpenMove"]$estimate 
-  medOpen <- median(DT$propOpenMove, na.rm = T)
+  #SLMove <- fix_vals[term == "I(log(sl_ + 1)):propOpenMove"]$estimate 
+  #medOpen <- median(DT$propOpenMove, na.rm = T)
   
   #SLNN <- move_covs_dat01[term == "I(log(StartDist + 1)):I(log(sl_ + 1))"]$estimate 
   #medNN <- log(median(DT$StartDist + 1, na.rm = T))
@@ -106,7 +106,7 @@ for(i in 1:n){
   speed = (shape + Bi + 
              (Bij*prop) + 
              (SLForest * medForest) +
-             (SLMove * medOpen) +
+             #(SLMove * medOpen) +
              #(SLNN * medNN) +
              (SLSRI * medSRI)
              
@@ -145,7 +145,7 @@ for(i in 1:n){
   
   speed = (shape+Bi+(Bij*prop) + 
              (fix_vals[term == "I(log(sl_ + 1)):propLichen"]$estimate * median(DT$propLichen, na.rm = T)) +
-             (fix_vals[term == "I(log(sl_ + 1)):propOpenMove"]$estimate * median(DT$propOpenMove, na.rm = T)) +
+             #(fix_vals[term == "I(log(sl_ + 1)):propOpenMove"]$estimate * median(DT$propOpenMove, na.rm = T)) +
              #(move_covs_dat01[term == "I(log(StartDist + 1)):I(log(sl_ + 1))"]$estimate * log(median(DT$StartDist + 1, na.rm = T))) +
              (move_covs_dat01[term == "I(log(sl_ + 1)):I(log(sri + 0.125))"]$estimate * log(median(DT$sri + 0.125, na.rm = T))) 
            )*(scale)
@@ -162,47 +162,47 @@ for(i in 1:n){
 move_forest <- rbindlist(move_forest)
 
 
-## Calculate speed for Forest
-move_open <- NULL
-for(i in 1:n){
+## Calculate speed for open
+#move_open <- NULL
+#for(i in 1:n){
   
-  k = as.character(caribou_IDs[i])
+#  k = as.character(caribou_IDs[i])
   
-  move_covs_dat01 = indiv.se[IDYr == k]
-  move_pars_dat01 = Params[IDYr == k]
+#  move_covs_dat01 = indiv.se[IDYr == k]
+#  move_pars_dat01 = Params[IDYr == k]
   
-  prop = seq(0,1, by = 0.01)
+#  prop = seq(0,1, by = 0.01)
   
-  shape = move_pars_dat01$shape
-  scale = move_pars_dat01$scale
+#  shape = move_pars_dat01$shape
+#  scale = move_pars_dat01$scale
+#  
+#  covi = move_covs_dat01[term == "I(log(sl_ + 1))"]
+#  Bi = covi$estimate
+#  covij = fix_vals[term == "I(log(sl_ + 1)):propOpenMove"]
+#  Bij = covij$estimate
   
-  covi = move_covs_dat01[term == "I(log(sl_ + 1))"]
-  Bi = covi$estimate
-  covij = fix_vals[term == "I(log(sl_ + 1)):propOpenMove"]
-  Bij = covij$estimate
-  
-  speed = (shape+Bi+(Bij*prop) + 
-             (fix_vals[term == "I(log(sl_ + 1)):propForest"]$estimate * median(DT$propForest, na.rm = T)) +
-             (fix_vals[term == "I(log(sl_ + 1)):propLichen"]$estimate * median(DT$propLichen, na.rm = T)) +
+#  speed = (shape+Bi+(Bij*prop) + 
+#             (fix_vals[term == "I(log(sl_ + 1)):propForest"]$estimate * median(DT$propForest, na.rm = T)) +
+#             (fix_vals[term == "I(log(sl_ + 1)):propLichen"]$estimate * median(DT$propLichen, na.rm = T)) +
              #(move_covs_dat01[term == "I(log(StartDist + 1)):I(log(sl_ + 1))"]$estimate * log(median(DT$StartDist + 1, na.rm = T))) +
-             (move_covs_dat01[term == "I(log(sl_ + 1)):I(log(sri + 0.125))"]$estimate * log(median(DT$sri + 0.125, na.rm = T)))
-           )*(scale)
+#             (move_covs_dat01[term == "I(log(sl_ + 1)):I(log(sri + 0.125))"]$estimate * log(median(DT$sri + 0.125, na.rm = T)))
+#           )*(scale)
   
-  move_open[[i]] = data.table(IDYr = k, 
-                                Habitat = "Open",
-                                Bi = Bi, 
-                                Bij = Bij, 
-                                Proportion = prop, 
-                                Speed = speed) 
+#  move_open[[i]] = data.table(IDYr = k, 
+#                                Habitat = "Open",
+#                                Bi = Bi, 
+#                                Bij = Bij, 
+#                                Proportion = prop, 
+#                                Speed = speed) 
   
   
-}
-move_open <- rbindlist(move_open)
+#}
+#move_open <- rbindlist(move_open)
 
-move_all <- rbind(move_lichen, move_forest, move_open)
+move_all <- rbind(move_lichen, move_forest)#, move_open)
 
 
-png("graphics/Fig3.png", width = 5000, height = 2500, units = "px", res = 600)
+png("graphics/Fig3.png", width = 5000, height = 3000, units = "px", res = 600)
 fig3a <- ggplot(data = move_all[Habitat == "Lichen"]) +
   geom_smooth(aes(Proportion, Speed, group = IDYr), 
               fill = "#91bfdb", 
@@ -242,6 +242,11 @@ fig3b <- ggplot(data = move_all[Habitat == "Forest"]) +
         panel.border = element_rect(colour = "black", fill=NA, size = 1)) 
 
 
+gridExtra::grid.arrange(fig3a, fig3b, nrow = 1)
+dev.off()
+
+
+
 fig3c <- ggplot(data = move_all[Habitat == "Open"]) +
   geom_smooth(aes(Proportion, Speed, group = IDYr), 
               fill = "#5ab4ac", 
@@ -260,6 +265,3 @@ fig3c <- ggplot(data = move_all[Habitat == "Open"]) +
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
         panel.border = element_rect(colour = "black", fill=NA, size = 1)) 
-
-gridExtra::grid.arrange(fig3a, fig3b, fig3c, nrow = 1)
-dev.off()
