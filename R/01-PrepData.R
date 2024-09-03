@@ -34,6 +34,8 @@ fogo[, idate := as.IDate(idate)]
 fogo[, itime := as.ITime(itime)]
 fogo[, datetime := as.POSIXct(paste(idate,itime), format = "%Y-%m-%d %H:%M:%S" )]
 
+fogo[, jdate := yday(itime)]
+
 ### ID by Yr
 fogo$IDYr <- paste(fogo$ANIMAL_ID, fogo$Year, sep = "_")
 

@@ -139,12 +139,14 @@ a1 <- ggplot() +
     y = mean_y_1,
     xend = mean_x_2,
     yend = mean_y_2), alpha = 0.5) +
+  scale_color_manual(values = c("#1b9e77", "#d95f02", "#7570b3")) +
   geom_nodes(data = centroid_DT1, 
              aes(x = mean_x,
                  y = mean_y, 
                  color = as.factor(membership)),
-             size = 1) +
-  ggtitle("A) 2017") +
+             size = 4,
+             alpha = 0.5) +
+  ggtitle("2017") +
   labs(x = 'Longitude', y = 'Latitude') +   
   themeMap
 
@@ -160,7 +162,9 @@ a2 <- ggplot() +
              aes(x = mean_x,
                  y = mean_y, 
                  color = as.factor(membership)),
-             size = 1)  +
+             size = 4,
+             alpha = 0.5)  +
+  scale_color_manual(values = c("#1b9e77", "#d95f02", "#7570b3", "#e7298a")) +
   ggtitle("B) 2018") +
   labs(x = 'Longitude', y = 'Latitude') +   
   themeMap
@@ -177,11 +181,21 @@ a3 <- ggplot() +
              aes(x = mean_x,
                  y = mean_y, 
                  color = as.factor(membership)),
-             size = 1)  +
+             size = 4,
+             alpha = 0.5)  +
+  scale_color_manual(values = c("#d95f02","#1b9e77",  "#7570b3")) +
   ggtitle("C) 2019") +
   labs(x = 'Longitude', y = 'Latitude') +   
   themeMap
 
-png("graphics/FigS4.png", width = 5000, height = 3000, units = "px", res = 500)
-grid.arrange(a1, a2, a3, nrow = 1)
+png("graphics/FigS4a.png", width = 5000, height = 3000, units = "px", res = 500)
+a1
+dev.off()
+
+png("graphics/FigS4b.png", width = 5000, height = 3000, units = "px", res = 500)
+a2
+dev.off()
+
+png("graphics/FigS4c.png", width = 5000, height = 3000, units = "px", res = 500)
+a3
 dev.off()

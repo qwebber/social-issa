@@ -10,7 +10,7 @@ libs <- c('data.table', 'ggplot2', 'rgdal', 'spatsoc', 'amt',
 lapply(libs, require, character.only = TRUE)
 
 ### Input raw data ----
-DT <- readRDS("output/location-data/1-clean-all.RDS")
+DT <- readRDS("..caribou/output/location-data/1-clean-all.RDS")
 DT <- DT[season == "winter"]
 lcFogo <- raster("../fogo_coyote_repeat/data/raw-data/Landcover/FogoSDSS_RS.tif") # This is a landcover map with different habitat types
 Legend <- fread("../fogo_coyote_repeat/data/raw-data/Landcover/Legend.csv") 

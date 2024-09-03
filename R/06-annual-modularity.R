@@ -41,6 +41,7 @@ source("functions/dynamic_network2.R")
 
 mods <- dynamic_network(DT, id = 'ANIMAL_ID', 
                         by = c('lagYear'))
+
 saveRDS(mods, "output/6-network-stats.RDS")
 
 mods$ID1 <- mods$ID
