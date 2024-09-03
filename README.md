@@ -9,7 +9,7 @@
   - Authors:
       - [Quinn M.R. Webber](https://qwebber.weebly.com/)
       - Christina M. Prokopenko
-      - Katrien A. Turner
+      - Katrien A. Kingdon
       - Julie W. Turner
       - [Eric Vander Wal](https://weel.gitlab.io/)
 
